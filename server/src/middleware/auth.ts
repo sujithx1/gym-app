@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { Context, Next } from 'hono';
 import { jwtVerify, SignJWT } from 'jose';
 
