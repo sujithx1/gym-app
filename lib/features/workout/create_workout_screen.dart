@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/gym_theme.dart';
+import '../../core/providers/app_providers.dart';
 import 'today_workout_screen.dart';
 
 class CreateWorkoutScreen extends ConsumerStatefulWidget {
@@ -20,12 +21,23 @@ class _CreateWorkoutScreenState extends ConsumerState<CreateWorkoutScreen> {
     super.dispose();
   }
 
-  void _addCustomExercise(String name, String muscleGroup) {
+  void _addCustomExercise(String name, String muscleGroup) async {
     if (name.trim().isEmpty) return;
+
+    final api = ref.read(apiClientProvider);
+    final result = await api.createExercise(
+      name: name.trim(),
+      muscleGroup: muscleGroup.trim().isEmpty ? 'General' : muscleGroup.trim(),
+      equipment: 'Custom',
+    );
+
+    final exId = result != null && result['id'] != null
+        ? result['id']
+        : 'ex_${DateTime.now().millisecondsSinceEpoch}_${name.toLowerCase().replaceAll(' ', '_')}';
 
     setState(() {
       _selectedExercises.add({
-        'id': 'ex_${DateTime.now().millisecondsSinceEpoch}_${name.toLowerCase().replaceAll(' ', '_')}',
+        'id': exId,
         'name': name.trim(),
         'muscleGroup': muscleGroup.trim().isEmpty ? 'General' : muscleGroup.trim(),
         'equipment': 'Custom',
@@ -68,7 +80,7 @@ class _CreateWorkoutScreenState extends ConsumerState<CreateWorkoutScreen> {
     });
   }
 
-  void _startCustomWorkout() {
+  void _startCustomWorkout() async {
     final dayName = _dayNameController.text.trim();
     if (dayName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -83,20 +95,29 @@ class _CreateWorkoutScreenState extends ConsumerState<CreateWorkoutScreen> {
       return;
     }
 
+    final api = ref.read(apiClientProvider);
+    final sessionId = await api.startSession(null, dayName);
+
     final workoutData = {
       'name': dayName.toUpperCase(),
       'exerciseCount': _selectedExercises.length,
       'totalSets': _selectedExercises.fold<int>(0, (sum, item) => sum + (item['sets'] as List).length),
       'estimatedMinutes': _selectedExercises.length * 10,
       'exercises': _selectedExercises,
+      'activeSession': {
+        'id': sessionId,
+        'status': 'in_progress',
+      },
     };
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TodayWorkoutScreen(todayData: workoutData),
-      ),
-    );
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TodayWorkoutScreen(todayData: workoutData),
+        ),
+      );
+    }
   }
 
   void _showAddExerciseDialog() {

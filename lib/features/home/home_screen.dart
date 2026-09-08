@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+
 import '../../core/theme/gym_theme.dart';
 import '../../core/providers/app_providers.dart';
 import '../workout/today_workout_screen.dart';
@@ -69,7 +70,11 @@ class HomeScreen extends ConsumerWidget {
                         shape: BoxShape.circle,
                         border: Border.all(color: GymTheme.border),
                       ),
-                      child: const Icon(Icons.person, color: GymTheme.primary, size: 20),
+                      child: const Icon(
+                        Icons.person,
+                        color: GymTheme.primary,
+                        size: 20,
+                      ),
                     ),
                   ],
                 ),
@@ -79,13 +84,15 @@ class HomeScreen extends ConsumerWidget {
                 progressAsync.when(
                   data: (data) {
                     final summary = data['summary'] ?? {};
-                    final streak = summary['streakDays'] ?? 4;
+                    final streak = summary['streakDays'] ?? 0;
                     return Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: GymTheme.surface,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: GymTheme.primary.withOpacity(0.3)),
+                        border: Border.all(
+                          color: GymTheme.primary.withOpacity(0.3),
+                        ),
                       ),
                       child: Row(
                         children: [
@@ -95,25 +102,34 @@ class HomeScreen extends ConsumerWidget {
                               color: GymTheme.primary.withOpacity(0.2),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.local_fire_department, color: GymTheme.primary, size: 22),
+                            child: const Icon(
+                              Icons.local_fire_department,
+                              color: GymTheme.primary,
+                              size: 22,
+                            ),
                           ),
                           const SizedBox(width: 14),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '$streak Day Streak 🔥',
-                                style: const TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold,
-                                  color: GymTheme.textPrimary,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '$streak Day Streak 🔥',
+                                  style: const TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.bold,
+                                    color: GymTheme.textPrimary,
+                                  ),
                                 ),
-                              ),
-                              const Text(
-                                'Keep momentum building every single workout!',
-                                style: TextStyle(fontSize: 12, color: GymTheme.textMuted),
-                              ),
-                            ],
+                                const Text(
+                                  'Keep momentum building every single workout!',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: GymTheme.textMuted,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -139,7 +155,9 @@ class HomeScreen extends ConsumerWidget {
                 todayAsync.when(
                   data: (data) {
                     final today = data['today'];
-                    final activeSession = today != null ? today['activeSession'] : null;
+                    final activeSession = today != null
+                        ? today['activeSession']
+                        : null;
 
                     // If no active session exists for today, prompt user to create a workout manually
                     if (today == null || activeSession == null) {
@@ -155,7 +173,10 @@ class HomeScreen extends ConsumerWidget {
                       decoration: BoxDecoration(
                         color: GymTheme.surface,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: GymTheme.primary.withOpacity(0.4), width: 1.5),
+                        border: Border.all(
+                          color: GymTheme.primary.withOpacity(0.4),
+                          width: 1.5,
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: GymTheme.primary.withOpacity(0.08),
@@ -172,7 +193,10 @@ class HomeScreen extends ConsumerWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: GymTheme.primaryGlow,
                                   borderRadius: BorderRadius.circular(8),
@@ -192,14 +216,21 @@ class HomeScreen extends ConsumerWidget {
 
                               if (activeSession['status'] == 'completed')
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: GymTheme.success.withOpacity(0.2),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: const Row(
                                     children: [
-                                      Icon(Icons.check_circle, color: GymTheme.success, size: 14),
+                                      Icon(
+                                        Icons.check_circle,
+                                        color: GymTheme.success,
+                                        size: 14,
+                                      ),
                                       SizedBox(width: 4),
                                       Text(
                                         'DONE',
@@ -231,11 +262,17 @@ class HomeScreen extends ConsumerWidget {
                           // Metadata Badges (Exercises, Sets, Est duration)
                           Row(
                             children: [
-                              _buildMetaBadge(Icons.fitness_center, '$exerciseCount Exercises'),
+                              _buildMetaBadge(
+                                Icons.fitness_center,
+                                '$exerciseCount Exercises',
+                              ),
                               const SizedBox(width: 12),
                               _buildMetaBadge(Icons.layers, '$totalSets Sets'),
                               const SizedBox(width: 12),
-                              _buildMetaBadge(Icons.access_time, '~$estMinutes min'),
+                              _buildMetaBadge(
+                                Icons.access_time,
+                                '~$estMinutes min',
+                              ),
                             ],
                           ),
                           const SizedBox(height: 22),
@@ -252,11 +289,18 @@ class HomeScreen extends ConsumerWidget {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => TodayWorkoutScreen(todayData: today),
+                                          builder: (context) =>
+                                              TodayWorkoutScreen(
+                                                todayData: today,
+                                              ),
                                         ),
                                       );
                                     },
-                                    icon: const Icon(Icons.play_arrow, color: Colors.black, size: 20),
+                                    icon: const Icon(
+                                      Icons.play_arrow,
+                                      color: Colors.black,
+                                      size: 20,
+                                    ),
                                     label: Text(
                                       activeSession['status'] == 'in_progress'
                                           ? 'CONTINUE WORKOUT'
@@ -270,7 +314,9 @@ class HomeScreen extends ConsumerWidget {
                                     ),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: GymTheme.primary,
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -284,14 +330,28 @@ class HomeScreen extends ConsumerWidget {
                                     onPressed: () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => const CreateWorkoutScreen()),
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const CreateWorkoutScreen(),
+                                        ),
                                       );
                                     },
                                     style: OutlinedButton.styleFrom(
-                                      side: const BorderSide(color: GymTheme.border),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                      side: const BorderSide(
+                                        color: GymTheme.border,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
                                     ),
-                                    child: const Text('+ NEW', style: TextStyle(color: GymTheme.textPrimary, fontWeight: FontWeight.bold, fontSize: 13)),
+                                    child: const Text(
+                                      '+ NEW',
+                                      style: TextStyle(
+                                        color: GymTheme.textPrimary,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -351,7 +411,11 @@ class HomeScreen extends ConsumerWidget {
                               children: [
                                 Row(
                                   children: [
-                                    const Icon(Icons.emoji_events, color: GymTheme.primary, size: 16),
+                                    const Icon(
+                                      Icons.emoji_events,
+                                      color: GymTheme.primary,
+                                      size: 16,
+                                    ),
                                     const SizedBox(width: 6),
                                     Expanded(
                                       child: Text(
@@ -378,7 +442,10 @@ class HomeScreen extends ConsumerWidget {
                                 ),
                                 Text(
                                   '× ${pr['maxReps']} reps',
-                                  style: const TextStyle(fontSize: 12, color: GymTheme.textMuted),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: GymTheme.textMuted,
+                                  ),
                                 ),
                               ],
                             ),
@@ -430,7 +497,11 @@ class HomeScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           const Text(
             'CREATE TODAY\'S WORKOUT',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: GymTheme.textPrimary),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: GymTheme.textPrimary,
+            ),
           ),
           const SizedBox(height: 6),
           const Text(
@@ -446,12 +517,22 @@ class HomeScreen extends ConsumerWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const CreateWorkoutScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const CreateWorkoutScreen(),
+                  ),
                 );
               },
               icon: const Icon(Icons.add, color: Colors.black),
-              label: const Text('CREATE WORKOUT', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-              style: ElevatedButton.styleFrom(backgroundColor: GymTheme.primary),
+              label: const Text(
+                'CREATE WORKOUT',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: GymTheme.primary,
+              ),
             ),
           ),
         ],

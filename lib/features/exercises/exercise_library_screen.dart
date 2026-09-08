@@ -54,7 +54,11 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
             onPressed: () async {
               if (nameCtrl.text.trim().isNotEmpty) {
                 final api = ref.read(apiClientProvider);
-                await api.getExercises();
+                await api.createExercise(
+                  name: nameCtrl.text.trim(),
+                  muscleGroup: groupCtrl.text.trim().isEmpty ? 'General' : groupCtrl.text.trim(),
+                  equipment: equipCtrl.text.trim().isEmpty ? 'Barbell' : equipCtrl.text.trim(),
+                );
                 ref.invalidate(exercisesProvider);
                 if (mounted) Navigator.pop(context);
               }
@@ -124,50 +128,62 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
 
           // Exercises List
           Expanded(
-            child: exercisesAsync.when(
-              data: (list) {
-                if (list.isEmpty) {
-                  return const Center(child: Text('No exercises found', style: TextStyle(color: GymTheme.textMuted)));
-                }
-
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: list.length,
-                  itemBuilder: (context, index) {
-                    final ex = list[index];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        color: GymTheme.surface,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: GymTheme.border),
-                      ),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                        leading: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: GymTheme.surfaceElevated,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Icon(Icons.fitness_center, color: GymTheme.primary, size: 20),
-                        ),
-                        title: Text(
-                          ex['name'] ?? '',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: GymTheme.textPrimary),
-                        ),
-                        subtitle: Text(
-                          '${ex['muscle_group'] ?? ex['muscleGroup']} • ${ex['equipment']}',
-                          style: const TextStyle(fontSize: 12, color: GymTheme.textMuted),
-                        ),
-                        trailing: const Icon(Icons.chevron_right, color: GymTheme.textMuted, size: 18),
-                      ),
-                    );
-                  },
-                );
+            child: RefreshIndicator(
+              onRefresh: () async {
+                ref.invalidate(exercisesProvider);
               },
-              loading: () => const Center(child: CircularProgressIndicator(color: GymTheme.primary)),
-              error: (_, __) => const Center(child: Text('Error loading exercises', style: TextStyle(color: GymTheme.danger))),
+              color: GymTheme.primary,
+              backgroundColor: GymTheme.surface,
+              child: exercisesAsync.when(
+                data: (list) {
+                  if (list.isEmpty) {
+                    return ListView(
+                      children: const [
+                        SizedBox(height: 100),
+                        Center(child: Text('No exercises found', style: TextStyle(color: GymTheme.textMuted))),
+                      ],
+                    );
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: list.length,
+                    itemBuilder: (context, index) {
+                      final ex = list[index];
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: GymTheme.surface,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: GymTheme.border),
+                        ),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                          leading: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: GymTheme.surfaceElevated,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(Icons.fitness_center, color: GymTheme.primary, size: 20),
+                          ),
+                          title: Text(
+                            ex['name'] ?? '',
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: GymTheme.textPrimary),
+                          ),
+                          subtitle: Text(
+                            '${ex['muscle_group'] ?? ex['muscleGroup']} • ${ex['equipment']}',
+                            style: const TextStyle(fontSize: 12, color: GymTheme.textMuted),
+                          ),
+                          trailing: const Icon(Icons.chevron_right, color: GymTheme.textMuted, size: 18),
+                        ),
+                      );
+                    },
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator(color: GymTheme.primary)),
+                error: (_, __) => const Center(child: Text('Error loading exercises', style: TextStyle(color: GymTheme.danger))),
+              ),
             ),
           ),
         ],

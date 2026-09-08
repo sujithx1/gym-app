@@ -181,5 +181,32 @@ class ApiClient {
 
     return [];
   }
+
+  Future<Map<String, dynamic>?> createExercise({
+    required String name,
+    required String muscleGroup,
+    required String equipment,
+    String? instructions,
+  }) async {
+    try {
+      final res = await http.post(
+        Uri.parse('$baseUrl/exercises'),
+        headers: _headers,
+        body: jsonEncode({
+          'name': name,
+          'muscleGroup': muscleGroup,
+          'equipment': equipment,
+          'instructions': instructions ?? '',
+        }),
+      ).timeout(const Duration(seconds: 5));
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return jsonDecode(res.body);
+      }
+    } catch (e) {
+      print('Error creating exercise: $e');
+    }
+    return null;
+  }
 }
 

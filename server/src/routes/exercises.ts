@@ -13,6 +13,7 @@ exerciseRoutes.get('/', async (c) => {
     const userId = c.get('userId');
     const muscleGroup = c.req.query('muscleGroup');
 
+
     const userCondition = or(
       eq(exercises.isCustom, false),
       eq(exercises.userId, userId)
@@ -40,6 +41,7 @@ exerciseRoutes.post('/', async (c) => {
     const userId = c.get('userId');
     const { name, muscleGroup, equipment, instructions } = await c.req.json();
 
+    console.log(name, muscleGroup, equipment, instructions);
     if (!name || !muscleGroup) {
       return c.json({ error: 'Name and Muscle Group are required' }, 400);
     }
