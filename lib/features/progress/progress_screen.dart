@@ -226,6 +226,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                         sideTitles: SideTitles(
                           showTitles: true,
                           getTitlesWidget: (val, _) {
+                            if (val % 1 != 0) return const SizedBox.shrink();
                             final months = ['AUG', 'SEP', 'OCT', 'NOV'];
                             int index = val.toInt();
                             if (index >= 0 && index < months.length) {
@@ -255,7 +256,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                         dotData: const FlDotData(show: true),
                         belowBarData: BarAreaData(
                           show: true,
-                          color: GymTheme.mint.withOpacity(0.5),
+                          color: GymTheme.mint.withValues(alpha: 0.5),
                         ),
                       ),
                     ],
@@ -291,6 +292,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                         sideTitles: SideTitles(
                           showTitles: true,
                           getTitlesWidget: (val, _) {
+                            if (val % 1 != 0) return const SizedBox.shrink();
                             final weeks = ['W1', 'W2', 'W3', 'W4', 'W5'];
                             int index = val.toInt();
                             if (index >= 0 && index < weeks.length) {

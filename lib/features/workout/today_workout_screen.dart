@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/gym_theme.dart';
 import '../../core/providers/app_providers.dart';
+import '../../core/widgets/ios_button.dart';
 import 'completion_dialog.dart';
 
 class TodayWorkoutScreen extends ConsumerStatefulWidget {
@@ -589,24 +590,23 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
               border: Border(top: BorderSide(color: GymTheme.border)),
             ),
             child: SafeArea(
-              child: SizedBox(
-                width: double.infinity,
+              child: IosButton(
                 height: 56,
-                child: ElevatedButton.icon(
-                  onPressed: _isSaving ? null : _completeWorkout,
-                  icon: const Icon(Icons.done_all_rounded, color: Colors.white, size: 22),
-                  label: _isSaving
-                      ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
-                      : const Text(
-                          'WORKOUT COMPLETE',
-                          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: Colors.white, letterSpacing: 1.2),
-                        ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: GymTheme.primary,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    elevation: 0,
-                  ),
-                ),
+                width: double.infinity,
+                onPressed: _isSaving ? null : _completeWorkout,
+                child: _isSaving
+                    ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.done_all_rounded, color: Colors.white, size: 22),
+                          SizedBox(width: 8),
+                          Text(
+                            'WORKOUT COMPLETE',
+                            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: Colors.white, letterSpacing: 1.2),
+                          ),
+                        ],
+                      ),
               ),
             ),
           ),

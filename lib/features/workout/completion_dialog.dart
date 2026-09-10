@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/gym_theme.dart';
+import '../../core/widgets/ios_button.dart';
 
 class CompletionDialog extends StatelessWidget {
   final Map<String, dynamic> summary;
@@ -98,24 +99,16 @@ class CompletionDialog extends StatelessWidget {
           const SizedBox(height: 28),
 
           // Close Button
-          SizedBox(
-            width: double.infinity,
+          IosButton(
             height: 56,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context); // Close bottom sheet
-                Navigator.pop(context); // Return to home
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: GymTheme.primary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                elevation: 0,
-              ),
-              child: const Text(
-                'CONTINUE',
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, letterSpacing: 1.2, color: Colors.white),
-              ),
+            width: double.infinity,
+            onPressed: () {
+              Navigator.pop(context); // Close bottom sheet
+              Navigator.pop(context); // Return to home
+            },
+            child: const Text(
+              'CONTINUE',
+              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, letterSpacing: 1.2, color: Colors.white),
             ),
           ),
         ],

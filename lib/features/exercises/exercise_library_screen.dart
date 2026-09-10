@@ -88,11 +88,12 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
       body: Column(
         children: [
           // Filter Muscle Groups Chips
-          SizedBox(
-            height: 50,
+          Container(
+            height: 54,
+            padding: const EdgeInsets.symmetric(vertical: 6),
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: _groups.length,
               itemBuilder: (context, index) {
                 final g = _groups[index];
@@ -100,6 +101,8 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: FilterChip(
+                    visualDensity: VisualDensity.compact,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     label: Text(g.isEmpty ? 'All Muscles' : g),
                     selected: isSelected,
                     onSelected: (selected) {
@@ -109,11 +112,11 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
                       ref.read(exerciseFilterProvider.notifier).state = g;
                     },
                     selectedColor: GymTheme.primary,
-                    checkmarkColor: Colors.black,
+                    checkmarkColor: Colors.white,
                     backgroundColor: GymTheme.surface,
                     labelStyle: TextStyle(
-                      color: isSelected ? Colors.black : GymTheme.textSecondary,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected ? Colors.white : GymTheme.textSecondary,
+                      fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                       fontSize: 12,
                     ),
                     shape: RoundedRectangleBorder(

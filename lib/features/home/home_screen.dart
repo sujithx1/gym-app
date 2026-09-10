@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../core/theme/gym_theme.dart';
 import '../../core/providers/app_providers.dart';
+import '../../core/widgets/ios_button.dart';
 import '../workout/today_workout_screen.dart';
 import '../workout/create_workout_screen.dart';
 
@@ -178,34 +179,26 @@ class HomeScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 24),
 
-                          SizedBox(
-                            width: double.infinity,
+                          IosButton(
                             height: 52,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TodayWorkoutScreen(todayData: today),
-                                  ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: GymTheme.primary,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                elevation: 0,
-                              ),
-                              child: Text(
-                                activeSession != null && activeSession['status'] == 'in_progress'
-                                    ? 'CONTINUE WORKOUT'
-                                    : 'START WORKOUT',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 14,
-                                  letterSpacing: 1.0,
-                                  color: Colors.white,
+                            width: double.infinity,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => TodayWorkoutScreen(todayData: today),
                                 ),
+                              );
+                            },
+                            child: Text(
+                              activeSession != null && activeSession['status'] == 'in_progress'
+                                  ? 'CONTINUE WORKOUT'
+                                  : 'START WORKOUT',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 14,
+                                letterSpacing: 1.0,
+                                color: Colors.white,
                               ),
                             ),
                           ),
@@ -455,7 +448,7 @@ class HomeScreen extends ConsumerWidget {
                     ];
 
                     return SizedBox(
-                      height: 115,
+                      height: 125,
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemCount: prs.length,
@@ -486,7 +479,7 @@ class HomeScreen extends ConsumerWidget {
                                     color: GymTheme.textPrimary,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
+                                const SizedBox(height: 6),
                                 Text(
                                   '${pr['maxWeight']} kg',
                                   style: const TextStyle(
@@ -560,30 +553,22 @@ class HomeScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
+          IosButton(
             height: 52,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const CreateWorkoutScreen()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: GymTheme.primary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                elevation: 0,
-              ),
-              child: const Text(
-                'CREATE WORKOUT',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 14,
-                  letterSpacing: 1.0,
-                ),
+            width: double.infinity,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CreateWorkoutScreen()),
+              );
+            },
+            child: const Text(
+              'CREATE WORKOUT',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+                fontSize: 14,
+                letterSpacing: 1.0,
               ),
             ),
           ),
