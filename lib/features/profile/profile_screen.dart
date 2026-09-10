@@ -70,7 +70,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     children: [
                       _buildProfileStat('${summary['totalWorkouts'] ?? 48}', 'Workouts'),
                       Container(height: 30, width: 1, color: GymTheme.border),
-                      _buildProfileStat('🔥 ${summary['streakDays'] ?? 12}', 'Streak'),
+                      _buildProfileStat('${summary['streakDays'] ?? 12}', 'Streak'),
                       Container(height: 30, width: 1, color: GymTheme.border),
                       _buildProfileStat('${((summary['totalVolumeKg'] ?? 182450) / 1000).toStringAsFixed(0)}k kg', 'Volume'),
                     ],

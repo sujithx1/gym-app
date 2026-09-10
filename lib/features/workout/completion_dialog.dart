@@ -38,7 +38,7 @@ class CompletionDialog extends StatelessWidget {
 
           // Title
           const Text(
-            'WORKOUT COMPLETE 🎉',
+            'WORKOUT COMPLETE',
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w800,

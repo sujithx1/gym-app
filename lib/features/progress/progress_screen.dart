@@ -94,7 +94,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
 
                   return Row(
                     children: [
-                      Expanded(child: _buildMetricCard('STREAK', '🔥 $streak Days', 'Current streak', GymTheme.primary)),
+                      Expanded(child: _buildMetricCard('STREAK', '$streak Days', 'Current streak', GymTheme.primary)),
                       const SizedBox(width: 10),
                       Expanded(child: _buildMetricCard('WORKOUTS', '$totalWorkouts', 'Total sessions', GymTheme.textPrimary)),
                       const SizedBox(width: 10),
