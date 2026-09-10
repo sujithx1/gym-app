@@ -13,78 +13,30 @@ class ProgressScreen extends ConsumerStatefulWidget {
 
 class _ProgressScreenState extends ConsumerState<ProgressScreen> {
   String _selectedExercise = 'Bench Press';
+  String _selectedTimeFrame = '3M';
 
   @override
   Widget build(BuildContext context) {
     final progressAsync = ref.watch(progressOverviewProvider);
 
     return Scaffold(
+      backgroundColor: GymTheme.background,
       appBar: AppBar(
-        title: const Text('PROGRESS & ANALYTICS', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: GymTheme.textPrimary)),
+        title: const Text('YOUR PROGRESS', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: GymTheme.textPrimary, letterSpacing: -0.5)),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(progressOverviewProvider);
         },
         color: GymTheme.primary,
+        backgroundColor: GymTheme.surface,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Weekly Attendance Section
-              const Text(
-                'WEEKLY ATTENDANCE',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: GymTheme.textMuted),
-              ),
-              const SizedBox(height: 10),
-
-              progressAsync.when(
-                data: (data) {
-                  final summary = data['summary'] ?? {};
-                  final weekly = (summary['weeklyAttendance'] as List?) ?? [true, true, false, true, true, false, false];
-                  final days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
-
-                  return Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: GymTheme.surface,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: GymTheme.border),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: List.generate(7, (i) {
-                        final bool done = i < weekly.length ? (weekly[i] as bool) : false;
-                        return Column(
-                          children: [
-                            Text(days[i], style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: GymTheme.textMuted)),
-                            const SizedBox(height: 8),
-                            Container(
-                              height: 36,
-                              width: 36,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: done ? GymTheme.primary : GymTheme.surfaceElevated,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: done ? GymTheme.primary : GymTheme.border),
-                              ),
-                              child: done
-                                  ? const Icon(Icons.check, size: 18, color: Colors.black)
-                                  : const Text('—', style: TextStyle(color: GymTheme.textMuted)),
-                            ),
-                          ],
-                        );
-                      }),
-                    ),
-                  );
-                },
-                loading: () => Container(height: 80, color: GymTheme.surface),
-                error: (_, __) => const SizedBox.shrink(),
-              ),
-              const SizedBox(height: 24),
-
-              // Overview Metrics 3-Column Grid
+              // Main Overview Statistics Grid (2 Column Editorial Card Layout)
               progressAsync.when(
                 data: (data) {
                   final summary = data['summary'] ?? {};
@@ -92,35 +44,126 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                   final totalWorkouts = summary['totalWorkouts'] ?? 48;
                   final totalVolume = (summary['totalVolumeKg'] as num?)?.toDouble() ?? 182450.0;
 
-                  return Row(
+                  return Column(
                     children: [
-                      Expanded(child: _buildMetricCard('STREAK', '$streak Days', 'Current streak', GymTheme.primary)),
-                      const SizedBox(width: 10),
-                      Expanded(child: _buildMetricCard('WORKOUTS', '$totalWorkouts', 'Total sessions', GymTheme.textPrimary)),
-                      const SizedBox(width: 10),
-                      Expanded(child: _buildMetricCard('VOLUME', '${(totalVolume / 1000).toStringAsFixed(1)}k kg', 'Lifetime lifted', GymTheme.secondary)),
+                      // Large Featured Workout Count Card
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(22),
+                        decoration: BoxDecoration(
+                          color: GymTheme.mint,
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(color: GymTheme.border.withOpacity(0.6)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'TOTAL WORKOUTS',
+                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: GymTheme.textSecondary),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '$totalWorkouts',
+                                  style: const TextStyle(fontSize: 40, fontWeight: FontWeight.w900, color: GymTheme.textPrimary, height: 1.0),
+                                ),
+                                const SizedBox(height: 4),
+                                const Text('Consistent dedication', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: GymTheme.textSecondary)),
+                              ],
+                            ),
+                            Container(
+                              width: 52,
+                              height: 52,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.fitness_center_rounded, color: GymTheme.textPrimary, size: 24),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // 2-Column Split Stat Cards
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: GymTheme.peach,
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(color: GymTheme.border.withOpacity(0.5)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'CURRENT STREAK',
+                                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.0, color: GymTheme.textSecondary),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    '$streak DAYS',
+                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: GymTheme.textPrimary),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: GymTheme.lavender,
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(color: GymTheme.border.withOpacity(0.5)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'TOTAL VOLUME',
+                                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.0, color: GymTheme.textSecondary),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    '${(totalVolume / 1000).toStringAsFixed(0)}K KG',
+                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: GymTheme.textPrimary),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   );
                 },
-                loading: () => Container(height: 90, color: GymTheme.surface),
+                loading: () => Container(height: 140, decoration: BoxDecoration(color: GymTheme.mint, borderRadius: BorderRadius.circular(28))),
                 error: (_, __) => const SizedBox.shrink(),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 32),
 
-              // Strength Progress Line Chart Section
+              // Strength Graph Section
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'STRENGTH PROGRESS',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: GymTheme.textMuted),
+                    'STRENGTH GRAPH',
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: GymTheme.textMuted),
                   ),
                   DropdownButton<String>(
                     value: _selectedExercise,
                     dropdownColor: GymTheme.surface,
-                    style: const TextStyle(color: GymTheme.textPrimary, fontWeight: FontWeight.bold, fontSize: 13),
+                    style: const TextStyle(color: GymTheme.textPrimary, fontWeight: FontWeight.w800, fontSize: 13),
                     underline: const SizedBox(),
-                    items: ['Bench Press', 'Barbell Back Squats', 'Deadlift', 'Overhead Press']
+                    items: ['Bench Press', 'Barbell Squat', 'Deadlift', 'Overhead Press']
                         .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                         .toList(),
                     onChanged: (val) {
@@ -129,15 +172,44 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
 
-              // Chart Container
+              // Time Range Selector Pills (1M, 3M, 6M, 1Y)
+              Row(
+                children: ['1M', '3M', '6M', '1Y'].map((timeFrame) {
+                  final bool isSelected = _selectedTimeFrame == timeFrame;
+                  return GestureDetector(
+                    onTap: () => setState(() => _selectedTimeFrame = timeFrame),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      margin: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: isSelected ? GymTheme.primary : GymTheme.surface,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: isSelected ? GymTheme.primary : GymTheme.border),
+                      ),
+                      child: Text(
+                        timeFrame,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          color: isSelected ? Colors.white : GymTheme.textSecondary,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 16),
+
+              // Line Chart Container
               Container(
-                height: 220,
+                height: 200,
                 padding: const EdgeInsets.fromLTRB(16, 24, 24, 16),
                 decoration: BoxDecoration(
                   color: GymTheme.surface,
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: GymTheme.border),
                 ),
                 child: LineChart(
@@ -145,7 +217,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                     gridData: FlGridData(
                       show: true,
                       drawVerticalLine: false,
-                      getDrawingHorizontalLine: (_) => FlLine(color: GymTheme.border, strokeWidth: 1),
+                      getDrawingHorizontalLine: (_) => const FlLine(color: GymTheme.border, strokeWidth: 1),
                     ),
                     titlesData: FlTitlesData(
                       rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -154,12 +226,12 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                         sideTitles: SideTitles(
                           showTitles: true,
                           getTitlesWidget: (val, _) {
-                            final months = ['Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                            final months = ['AUG', 'SEP', 'OCT', 'NOV'];
                             int index = val.toInt();
                             if (index >= 0 && index < months.length) {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 8.0),
-                                child: Text(months[index], style: const TextStyle(color: GymTheme.textMuted, fontSize: 11)),
+                                child: Text(months[index], style: const TextStyle(color: GymTheme.textMuted, fontSize: 11, fontWeight: FontWeight.bold)),
                               );
                             }
                             return const SizedBox.shrink();
@@ -173,9 +245,8 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                         spots: const [
                           FlSpot(0, 50),
                           FlSpot(1, 60),
-                          FlSpot(2, 65),
-                          FlSpot(3, 72.5),
-                          FlSpot(4, 80),
+                          FlSpot(2, 70),
+                          FlSpot(3, 80),
                         ],
                         isCurved: true,
                         color: GymTheme.primary,
@@ -184,73 +255,96 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                         dotData: const FlDotData(show: true),
                         belowBarData: BarAreaData(
                           show: true,
-                          color: GymTheme.primary.withOpacity(0.15),
+                          color: GymTheme.mint.withOpacity(0.5),
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 32),
 
-              // Personal Records Section
+              // Weekly Volume Graph
               const Text(
-                'PERSONAL RECORDS (PRs)',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: GymTheme.textMuted),
+                'WEEKLY VOLUME',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: GymTheme.textMuted),
               ),
               const SizedBox(height: 12),
 
-              progressAsync.when(
-                data: (data) {
-                  final prs = (data['personalRecords'] as List?) ?? [];
-                  return Column(
-                    children: prs.map((pr) {
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 10),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                        decoration: BoxDecoration(
-                          color: GymTheme.surface,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: GymTheme.border),
+              Container(
+                height: 180,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: GymTheme.surface,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: GymTheme.border),
+                ),
+                child: BarChart(
+                  BarChartData(
+                    alignment: BarChartAlignment.spaceAround,
+                    borderData: FlBorderData(show: false),
+                    titlesData: FlTitlesData(
+                      leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (val, _) {
+                            final weeks = ['W1', 'W2', 'W3', 'W4', 'W5'];
+                            int index = val.toInt();
+                            if (index >= 0 && index < weeks.length) {
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(weeks[index], style: const TextStyle(color: GymTheme.textSecondary, fontSize: 11, fontWeight: FontWeight.bold)),
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          },
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: GymTheme.primaryGlow,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(Icons.emoji_events, color: GymTheme.primary, size: 18),
-                                ),
-                                const SizedBox(width: 12),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      pr['exerciseName'] ?? 'Bench Press',
-                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: GymTheme.textPrimary),
-                                    ),
-                                    const Text('Heaviest load achieved', style: TextStyle(fontSize: 11, color: GymTheme.textMuted)),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            Text(
-                              '${pr['maxWeight']} kg × ${pr['maxReps']}',
-                              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: GymTheme.textPrimary),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  );
-                },
-                loading: () => Container(height: 100, color: GymTheme.surface),
-                error: (_, __) => const SizedBox.shrink(),
+                      ),
+                    ),
+                    barGroups: [
+                      _buildBarGroup(0, 12),
+                      _buildBarGroup(1, 16),
+                      _buildBarGroup(2, 14),
+                      _buildBarGroup(3, 22),
+                      _buildBarGroup(4, 18),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32),
+
+              // Personal Records Section
+              const Text(
+                'PERSONAL RECORDS',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: GymTheme.textMuted),
+              ),
+              const SizedBox(height: 12),
+
+              Column(
+                children: [
+                  _buildPrCard('Bench Press', '80 kg × 6', GymTheme.mint),
+                  _buildPrCard('Squat', '120 kg × 5', GymTheme.peach),
+                  _buildPrCard('Deadlift', '150 kg × 3', GymTheme.yellow),
+                ],
+              ),
+              const SizedBox(height: 32),
+
+              // Workout History Timeline
+              const Text(
+                'WORKOUT HISTORY',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: GymTheme.textMuted),
+              ),
+              const SizedBox(height: 12),
+
+              Column(
+                children: [
+                  _buildHistoryItem('TODAY', 'Chest + Triceps', '18 sets · 4,820 kg', GymTheme.mint),
+                  _buildHistoryItem('SEP 8', 'Back + Biceps', '16 sets · 4,200 kg', GymTheme.lavender),
+                  _buildHistoryItem('SEP 6', 'Legs', '20 sets · 5,100 kg', GymTheme.peach),
+                ],
               ),
             ],
           ),
@@ -259,24 +353,99 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
     );
   }
 
-  Widget _buildMetricCard(String label, String value, String subtext, Color accent) {
+  BarChartGroupData _buildBarGroup(int x, double y) {
+    return BarChartGroupData(
+      x: x,
+      barRods: [
+        BarChartRodData(
+          toY: y,
+          color: GymTheme.blue,
+          width: 22,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPrCard(String exercise, String record, Color color) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: const Text('PR', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: GymTheme.textPrimary)),
+              ),
+              const SizedBox(width: 14),
+              Text(
+                exercise,
+                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: GymTheme.textPrimary),
+              ),
+            ],
+          ),
+          Text(
+            record,
+            style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: GymTheme.textPrimary),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHistoryItem(String date, String title, String subtitle, Color color) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: GymTheme.surface,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: GymTheme.border),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: accent, letterSpacing: 0.8)),
-          const SizedBox(height: 6),
-          Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: GymTheme.textPrimary)),
-          const SizedBox(height: 2),
-          Text(subtext, style: const TextStyle(fontSize: 10, color: GymTheme.textMuted)),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              date,
+              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: GymTheme.textPrimary),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: GymTheme.textPrimary),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: GymTheme.textSecondary),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 }
+

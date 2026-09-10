@@ -36,176 +36,237 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Scaffold(
       backgroundColor: GymTheme.background,
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // App Badge / Icon
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 36),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+              // Abstract Geometric Line Illustration Accent
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(
-                      color: GymTheme.primaryGlow,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: GymTheme.primary, width: 2),
+                      color: GymTheme.mint,
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Icon(
-                      Icons.fitness_center,
-                      size: 44,
-                      color: GymTheme.primary,
+                    child: const Text(
+                      'GOOD TO SEE YOU',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.5,
+                        color: GymTheme.textPrimary,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 24),
 
-                // App Title
-                const Text(
-                  'GYM TRACKER',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 2.0,
-                    color: GymTheme.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                const Text(
-                  'Track workouts. Beat records. Build strength.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: GymTheme.textSecondary, fontSize: 14),
-                ),
-                const SizedBox(height: 40),
-
-                // Login Form Card
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: GymTheme.surface,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: GymTheme.border),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        blurRadius: 15,
-                        spreadRadius: 2,
+                  // Minimal geometric shapes illustration
+                  Row(
+                    children: [
+                      Container(
+                        width: 14,
+                        height: 14,
+                        decoration: const BoxDecoration(
+                          color: GymTheme.peach,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        width: 14,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          color: GymTheme.lavender,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        width: 14,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          color: GymTheme.blue,
+                          shape: BoxShape.rectangle,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
                     ],
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const Text(
-                        'Welcome Back',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: GymTheme.textPrimary),
-                      ),
-                      const SizedBox(height: 4),
-                      const Text('Sign in to access your workout plan', style: TextStyle(fontSize: 13, color: GymTheme.textMuted)),
-                      const SizedBox(height: 20),
+                ],
+              ),
+              const SizedBox(height: 32),
 
-                      // Username Field
-                      TextField(
-                        controller: _usernameController,
-                        style: const TextStyle(color: GymTheme.textPrimary),
-                        decoration: InputDecoration(
-                          labelText: 'Username',
-                          labelStyle: const TextStyle(color: GymTheme.textSecondary),
-                          prefixIcon: const Icon(Icons.person, color: GymTheme.primary, size: 20),
-                          filled: true,
-                          fillColor: GymTheme.surfaceElevated,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: GymTheme.border)),
-                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: GymTheme.border)),
+              // Large Heading
+              RichText(
+                text: const TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Ready to\n',
+                      style: TextStyle(
+                        fontSize: 42,
+                        fontWeight: FontWeight.w300,
+                        color: GymTheme.textPrimary,
+                        height: 1.1,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'train?',
+                      style: TextStyle(
+                        fontSize: 46,
+                        fontWeight: FontWeight.w900,
+                        color: GymTheme.textPrimary,
+                        height: 1.1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 44),
+
+              // Form Section
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: GymTheme.surface,
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(color: GymTheme.border, width: 1),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Username',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: GymTheme.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _usernameController,
+                      style: const TextStyle(
+                        color: GymTheme.textPrimary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Enter username',
+                        hintStyle: const TextStyle(color: GymTheme.textMuted, fontSize: 14),
+                        filled: true,
+                        fillColor: GymTheme.surfaceElevated,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    const Text(
+                      'Password',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: GymTheme.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      style: const TextStyle(
+                        color: GymTheme.textPrimary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Enter password',
+                        hintStyle: const TextStyle(color: GymTheme.textMuted, fontSize: 14),
+                        filled: true,
+                        fillColor: GymTheme.surfaceElevated,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+
+                    if (authState.error != null) ...[
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: GymTheme.danger.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          authState.error!,
+                          style: const TextStyle(color: GymTheme.danger, fontSize: 13, fontWeight: FontWeight.bold),
                         ),
                       ),
                       const SizedBox(height: 16),
-
-                      // Password Field
-                      TextField(
-                        controller: _passwordController,
-                        obscureText: true,
-                        style: const TextStyle(color: GymTheme.textPrimary),
-                        decoration: InputDecoration(
-                          labelText: 'Password',
-                          labelStyle: const TextStyle(color: GymTheme.textSecondary),
-                          prefixIcon: const Icon(Icons.lock_outline, color: GymTheme.primary, size: 20),
-                          filled: true,
-                          fillColor: GymTheme.surfaceElevated,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: GymTheme.border)),
-                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: GymTheme.border)),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-
-                      if (authState.error != null) ...[
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: GymTheme.danger.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: GymTheme.danger.withOpacity(0.3)),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.error_outline, color: GymTheme.danger, size: 18),
-                              const SizedBox(width: 8),
-                              Expanded(child: Text(authState.error!, style: const TextStyle(color: GymTheme.danger, fontSize: 13))),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                      ],
-
-                      // Login Button
-                      SizedBox(
-                        height: 52,
-                        child: ElevatedButton(
-                          onPressed: authState.isLoading ? null : _handleLogin,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: GymTheme.primary,
-                            foregroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            elevation: 0,
-                          ),
-                          child: authState.isLoading
-                              ? const SizedBox(
-                                  height: 22,
-                                  width: 22,
-                                  child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.black),
-                                )
-                              : const Text(
-                                  'LOGIN',
-                                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, letterSpacing: 1.0, color: Colors.black),
-                                ),
-                        ),
-                      ),
                     ],
-                  ),
-                ),
-                const SizedBox(height: 20),
 
-                // Quick Demo Auto-fill Helper
-                OutlinedButton.icon(
+                    // SIGN IN Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: authState.isLoading ? null : _handleLogin,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: GymTheme.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          elevation: 0,
+                        ),
+                        child: authState.isLoading
+                            ? const SizedBox(
+                                height: 22,
+                                width: 22,
+                                child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+                              )
+                            : const Text(
+                                'SIGN IN',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 15,
+                                  letterSpacing: 1.5,
+                                  color: Colors.white,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Quick Auto-fill button for developer convenience
+              Center(
+                child: TextButton.icon(
                   onPressed: () {
                     _usernameController.text = 'sujith';
                     _passwordController.text = 'password123';
                     _handleLogin();
                   },
-                  icon: const Icon(Icons.bolt, size: 16, color: GymTheme.textPrimary),
-                  label: const Text('Quick Demo Login (sujith)', style: TextStyle(color: GymTheme.textPrimary, fontWeight: FontWeight.bold)),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: GymTheme.border),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  icon: const Icon(Icons.flash_on, size: 16, color: GymTheme.textSecondary),
+                  label: const Text(
+                    'Quick Demo Sign In (sujith)',
+                    style: TextStyle(color: GymTheme.textSecondary, fontSize: 13, fontWeight: FontWeight.w600),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 }
+

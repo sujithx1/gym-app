@@ -11,8 +11,10 @@ class ProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
-  bool _useKg = true;
-  bool _restTimerEnabled = true;
+  String _unit = 'kg';
+  final String _theme = 'Light';
+  bool _restTimer = true;
+  bool _notifications = true;
 
   @override
   Widget build(BuildContext context) {
@@ -20,126 +22,158 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final progressAsync = ref.watch(progressOverviewProvider);
 
     return Scaffold(
+      backgroundColor: GymTheme.background,
       appBar: AppBar(
-        title: const Text('PROFILE & SETTINGS', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: GymTheme.textPrimary)),
+        title: const Text('PROFILE', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: GymTheme.textPrimary, letterSpacing: -0.5)),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // User Header
-            Center(
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: GymTheme.surface,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: GymTheme.primary, width: 2),
-                      boxShadow: [
-                        BoxShadow(color: GymTheme.primaryGlow, blurRadius: 20),
-                      ],
-                    ),
-                    child: const Icon(Icons.person, size: 44, color: GymTheme.primary),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    authState.username ?? 'Sujith',
-                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 22, color: GymTheme.textPrimary),
-                  ),
-                  const Text('Pro Member', style: TextStyle(color: GymTheme.primary, fontSize: 12, fontWeight: FontWeight.bold)),
-                ],
+            // Header User Name
+            Text(
+              authState.username ?? 'Sujith',
+              style: const TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.w900,
+                color: GymTheme.textPrimary,
+                letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 28),
+            const SizedBox(height: 20),
 
-            // Workout Stats Card Summary
+            // Top Stats Summary Cards
             progressAsync.when(
               data: (data) {
                 final summary = data['summary'] ?? {};
+                final workouts = summary['totalWorkouts'] ?? 48;
+                final streak = summary['streakDays'] ?? 12;
+                final volume = (summary['totalVolumeKg'] as num?)?.toDouble() ?? 182450.0;
+
                 return Container(
-                  padding: const EdgeInsets.all(18),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: GymTheme.surface,
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(24),
                     border: Border.all(color: GymTheme.border),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _buildProfileStat('${summary['totalWorkouts'] ?? 48}', 'Workouts'),
-                      Container(height: 30, width: 1, color: GymTheme.border),
-                      _buildProfileStat('${summary['streakDays'] ?? 12}', 'Streak'),
-                      Container(height: 30, width: 1, color: GymTheme.border),
-                      _buildProfileStat('${((summary['totalVolumeKg'] ?? 182450) / 1000).toStringAsFixed(0)}k kg', 'Volume'),
+                      _buildStatColumn('$workouts', 'Workouts'),
+                      Container(height: 32, width: 1, color: GymTheme.border),
+                      _buildStatColumn('$streak Days', 'Streak'),
+                      Container(height: 32, width: 1, color: GymTheme.border),
+                      _buildStatColumn('${(volume / 1000).toStringAsFixed(0)}K kg', 'Volume'),
                     ],
                   ),
                 );
               },
-              loading: () => const SizedBox.shrink(),
+              loading: () => Container(height: 80, decoration: BoxDecoration(color: GymTheme.surface, borderRadius: BorderRadius.circular(24))),
               error: (_, __) => const SizedBox.shrink(),
             ),
-            const SizedBox(height: 28),
+            const SizedBox(height: 32),
 
-            // Settings Options
+            const Divider(color: GymTheme.border, height: 1),
+            const SizedBox(height: 24),
+
+            // Settings Options Container
             Container(
               decoration: BoxDecoration(
                 color: GymTheme.surface,
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(24),
                 border: Border.all(color: GymTheme.border),
               ),
               child: Column(
                 children: [
+                  // Units Setting
                   ListTile(
-                    leading: const Icon(Icons.balance, color: GymTheme.primary, size: 20),
-                    title: const Text('Weight Unit', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: GymTheme.textPrimary)),
-                    trailing: SegmentedButton<bool>(
-                      segments: const [
-                        ButtonSegment(value: true, label: Text('KG')),
-                        ButtonSegment(value: false, label: Text('LB')),
-                      ],
-                      selected: {_useKg},
-                      onSelectionChanged: (val) {
-                        setState(() => _useKg = val.first);
-                      },
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.resolveWith(
-                          (states) => states.contains(WidgetState.selected) ? GymTheme.primary : GymTheme.surfaceElevated,
-                        ),
-                        foregroundColor: WidgetStateProperty.resolveWith(
-                          (states) => states.contains(WidgetState.selected) ? Colors.black : GymTheme.textSecondary,
-                        ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                    title: const Text('Units', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: GymTheme.textPrimary)),
+                    trailing: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: GymTheme.background,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: GymTheme.border),
+                      ),
+                      child: DropdownButton<String>(
+                        value: _unit,
+                        underline: const SizedBox(),
+                        dropdownColor: GymTheme.surface,
+                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: GymTheme.textPrimary),
+                        items: ['kg', 'lbs'].map((u) => DropdownMenuItem(value: u, child: Text(u))).toList(),
+                        onChanged: (val) {
+                          if (val != null) setState(() => _unit = val);
+                        },
                       ),
                     ),
                   ),
                   const Divider(color: GymTheme.border, height: 1),
+
+                  // Theme Setting
+                  ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                    title: const Text('Theme', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: GymTheme.textPrimary)),
+                    trailing: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: GymTheme.background,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: GymTheme.border),
+                      ),
+                      child: Text(
+                        _theme,
+                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: GymTheme.textPrimary),
+                      ),
+                    ),
+                  ),
+                  const Divider(color: GymTheme.border, height: 1),
+
+                  // Rest Timer Setting
                   SwitchListTile(
-                    secondary: const Icon(Icons.timer, color: GymTheme.primary, size: 20),
-                    title: const Text('Auto Rest Timer', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: GymTheme.textPrimary)),
-                    subtitle: const Text('Start timer after completing a set', style: TextStyle(fontSize: 12, color: GymTheme.textMuted)),
-                    value: _restTimerEnabled,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                    title: const Text('Rest Timer', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: GymTheme.textPrimary)),
+                    subtitle: const Text('Auto start timer between sets', style: TextStyle(fontSize: 12, color: GymTheme.textSecondary)),
+                    value: _restTimer,
                     activeTrackColor: GymTheme.primary,
-                    onChanged: (val) => setState(() => _restTimerEnabled = val),
+                    onChanged: (val) => setState(() => _restTimer = val),
+                  ),
+                  const Divider(color: GymTheme.border, height: 1),
+
+                  // Notifications Setting
+                  SwitchListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                    title: const Text('Notifications', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: GymTheme.textPrimary)),
+                    subtitle: const Text('Daily workout reminders', style: TextStyle(fontSize: 12, color: GymTheme.textSecondary)),
+                    value: _notifications,
+                    activeTrackColor: GymTheme.primary,
+                    onChanged: (val) => setState(() => _notifications = val),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 28),
+            const SizedBox(height: 32),
 
-            // Logout Button
+            const Divider(color: GymTheme.border, height: 1),
+            const SizedBox(height: 24),
+
+            // Logout Action Button
             SizedBox(
               width: double.infinity,
-              height: 52,
-              child: OutlinedButton.icon(
+              height: 54,
+              child: OutlinedButton(
                 onPressed: () {
                   ref.read(authProvider.notifier).logout();
                 },
-                icon: const Icon(Icons.logout, color: GymTheme.danger, size: 18),
-                label: const Text('LOG OUT', style: TextStyle(color: GymTheme.danger, fontWeight: FontWeight.w800)),
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: GymTheme.danger),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                ),
+                child: const Text(
+                  'LOGOUT',
+                  style: TextStyle(color: GymTheme.danger, fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 1.2),
                 ),
               ),
             ),
@@ -149,13 +183,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildProfileStat(String val, String label) {
+  Widget _buildStatColumn(String val, String label) {
     return Column(
       children: [
-        Text(val, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: GymTheme.textPrimary)),
+        Text(
+          val,
+          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: GymTheme.textPrimary),
+        ),
         const SizedBox(height: 2),
-        Text(label, style: const TextStyle(fontSize: 11, color: GymTheme.textMuted)),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: GymTheme.textSecondary),
+        ),
       ],
     );
   }
 }
+
+

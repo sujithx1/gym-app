@@ -17,9 +17,10 @@ class HomeScreen extends ConsumerWidget {
     final authState = ref.watch(authProvider);
 
     final now = DateTime.now();
-    final dateStr = DateFormat('EEEE, MMMM d').format(now).toUpperCase();
+    final dateStr = DateFormat('EEEE, MMMM d').format(now);
 
     return Scaffold(
+      backgroundColor: GymTheme.background,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
@@ -30,7 +31,7 @@ class HomeScreen extends ConsumerWidget {
           backgroundColor: GymTheme.surface,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -42,21 +43,21 @@ class HomeScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Good day, ${authState.username ?? 'Athlete'}',
+                          'Good morning, ${authState.username ?? 'Sujith'}',
                           style: const TextStyle(
-                            fontSize: 22,
+                            fontSize: 24,
                             fontWeight: FontWeight.w800,
                             color: GymTheme.textPrimary,
+                            letterSpacing: -0.5,
                           ),
                         ),
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 3),
                         Text(
                           dateStr,
                           style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.2,
-                            color: GymTheme.primary,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: GymTheme.textSecondary,
                           ),
                         ),
                       ],
@@ -64,128 +65,49 @@ class HomeScreen extends ConsumerWidget {
 
                     // User avatar badge
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      width: 44,
+                      height: 44,
                       decoration: BoxDecoration(
-                        color: GymTheme.surfaceElevated,
+                        color: GymTheme.surface,
                         shape: BoxShape.circle,
-                        border: Border.all(color: GymTheme.border),
+                        border: Border.all(color: GymTheme.border, width: 1),
                       ),
-                      child: const Icon(
-                        Icons.person,
-                        color: GymTheme.primary,
-                        size: 20,
+                      alignment: Alignment.center,
+                      child: const Text(
+                        'S',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16,
+                          color: GymTheme.textPrimary,
+                        ),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 24),
 
-                // Streak Banner
-                progressAsync.when(
-                  data: (data) {
-                    final summary = data['summary'] ?? {};
-                    final streak = summary['streakDays'] ?? 0;
-                    return Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: GymTheme.surface,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: GymTheme.primary.withOpacity(0.3),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: GymTheme.primary.withOpacity(0.2),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.local_fire_department,
-                              color: GymTheme.primary,
-                              size: 22,
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '$streak Day Streak',
-                                  style: const TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.bold,
-                                    color: GymTheme.textPrimary,
-                                  ),
-                                ),
-                                const Text(
-                                  'Keep momentum building every single workout!',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: GymTheme.textMuted,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  loading: () => Container(height: 60, color: GymTheme.surface),
-                  error: (_, __) => const SizedBox.shrink(),
-                ),
-                const SizedBox(height: 24),
-
-                // Today's Scheduled Workout Hero Card
-                const Text(
-                  "TODAY'S WORKOUT",
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
-                    color: GymTheme.textMuted,
-                  ),
-                ),
-                const SizedBox(height: 10),
-
+                // Hero Workout Card
                 todayAsync.when(
                   data: (data) {
                     final today = data['today'];
-                    final activeSession = today != null
-                        ? today['activeSession']
-                        : null;
+                    final activeSession = today != null ? today['activeSession'] : null;
 
-                    // If no active session exists for today, prompt user to create a workout manually
-                    if (today == null || activeSession == null) {
-                      return _buildCreateWorkoutPromptCard(context);
+                    if (today == null) {
+                      return _buildCreateWorkoutCard(context);
                     }
 
-                    final name = today['name'] ?? 'WORKOUT SESSION';
-                    final exerciseCount = today['exerciseCount'] ?? 0;
-                    final totalSets = today['totalSets'] ?? 0;
-                    final estMinutes = today['estimatedMinutes'] ?? 30;
+                    final name = today['name'] ?? 'CHEST + TRICEPS';
+                    final exerciseCount = today['exerciseCount'] ?? 5;
+                    final totalSets = today['totalSets'] ?? 18;
 
                     return Container(
+                      width: double.infinity,
                       decoration: BoxDecoration(
-                        color: GymTheme.surface,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: GymTheme.primary.withOpacity(0.4),
-                          width: 1.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: GymTheme.primary.withOpacity(0.08),
-                            blurRadius: 16,
-                            spreadRadius: 2,
-                          ),
-                        ],
+                        color: GymTheme.mint,
+                        borderRadius: BorderRadius.circular(28),
+                        border: Border.all(color: GymTheme.border.withOpacity(0.6)),
                       ),
-                      padding: const EdgeInsets.all(22),
+                      padding: const EdgeInsets.all(24),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -193,258 +115,392 @@ class HomeScreen extends ConsumerWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: GymTheme.primaryGlow,
-                                  borderRadius: BorderRadius.circular(8),
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
-                                child: Text(
-                                  activeSession['status'] == 'completed'
-                                      ? 'SESSION COMPLETED'
-                                      : 'SESSION IN PROGRESS',
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    color: GymTheme.primary,
-                                    letterSpacing: 1.0,
+                                child: const Text(
+                                  'TODAY\'S TRAINING',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 1.2,
+                                    color: GymTheme.textPrimary,
                                   ),
                                 ),
                               ),
 
-                              if (activeSession['status'] == 'completed')
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
+                              // Abstract geometric visual accent
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 10,
+                                    height: 10,
+                                    decoration: const BoxDecoration(
+                                      color: GymTheme.primary,
+                                      shape: BoxShape.circle,
+                                    ),
                                   ),
-                                  decoration: BoxDecoration(
-                                    color: GymTheme.success.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(8),
+                                  const SizedBox(width: 4),
+                                  Container(
+                                    width: 10,
+                                    height: 10,
+                                    decoration: BoxDecoration(
+                                      color: GymTheme.primary.withOpacity(0.3),
+                                      shape: BoxShape.circle,
+                                    ),
                                   ),
-                                  child: const Row(
-                                    children: [
-                                      Icon(
-                                        Icons.check_circle,
-                                        color: GymTheme.success,
-                                        size: 14,
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        'DONE',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                          color: GymTheme.success,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                ],
+                              ),
                             ],
                           ),
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 20),
 
-                          // Workout Split Title
                           Text(
                             name.toUpperCase(),
                             style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w800,
+                              fontSize: 26,
+                              fontWeight: FontWeight.w900,
                               color: GymTheme.textPrimary,
-                              letterSpacing: 1.0,
+                              letterSpacing: -0.5,
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 8),
 
-                          // Metadata Badges (Exercises, Sets, Est duration)
-                          Row(
-                            children: [
-                              _buildMetaBadge(
-                                Icons.fitness_center,
-                                '$exerciseCount Exercises',
-                              ),
-                              const SizedBox(width: 12),
-                              _buildMetaBadge(Icons.layers, '$totalSets Sets'),
-                              const SizedBox(width: 12),
-                              _buildMetaBadge(
-                                Icons.access_time,
-                                '~$estMinutes min',
-                              ),
-                            ],
+                          Text(
+                            '$exerciseCount exercises  •  $totalSets sets',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: GymTheme.textSecondary,
+                            ),
                           ),
-                          const SizedBox(height: 22),
+                          const SizedBox(height: 24),
 
-                          // Start & Custom Buttons
-                          Row(
-                            children: [
-                              Expanded(
-                                flex: 2,
-                                child: SizedBox(
-                                  height: 50,
-                                  child: ElevatedButton.icon(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              TodayWorkoutScreen(
-                                                todayData: today,
-                                              ),
-                                        ),
-                                      );
-                                    },
-                                    icon: const Icon(
-                                      Icons.play_arrow,
-                                      color: Colors.black,
-                                      size: 20,
-                                    ),
-                                    label: Text(
-                                      activeSession['status'] == 'in_progress'
-                                          ? 'CONTINUE WORKOUT'
-                                          : 'VIEW WORKOUT',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: GymTheme.primary,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => TodayWorkoutScreen(todayData: today),
                                   ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: GymTheme.primary,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                elevation: 0,
+                              ),
+                              child: Text(
+                                activeSession != null && activeSession['status'] == 'in_progress'
+                                    ? 'CONTINUE WORKOUT'
+                                    : 'START WORKOUT',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 14,
+                                  letterSpacing: 1.0,
+                                  color: Colors.white,
                                 ),
                               ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                flex: 1,
-                                child: SizedBox(
-                                  height: 50,
-                                  child: OutlinedButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const CreateWorkoutScreen(),
-                                        ),
-                                      );
-                                    },
-                                    style: OutlinedButton.styleFrom(
-                                      side: const BorderSide(
-                                        color: GymTheme.border,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ),
-                                    child: const Text(
-                                      '+ NEW',
-                                      style: TextStyle(
-                                        color: GymTheme.textPrimary,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ],
                       ),
                     );
                   },
-                  loading: () => _buildSkeletonLoader(),
-                  error: (_, __) => _buildCreateWorkoutPromptCard(context),
+                  loading: () => Container(height: 200, decoration: BoxDecoration(color: GymTheme.mint, borderRadius: BorderRadius.circular(28))),
+                  error: (_, __) => _buildCreateWorkoutCard(context),
+                ),
+                const SizedBox(height: 24),
+
+                // Daily Progress Section
+                progressAsync.when(
+                  data: (data) {
+                    final summary = data['summary'] ?? {};
+                    final completedSets = summary['totalSetsCompleted'] ?? 12;
+                    final targetSets = 18;
+                    final progressRatio = (completedSets / targetSets).clamp(0.0, 1.0);
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'TODAY\'S PROGRESS',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.2,
+                            color: GymTheme.textMuted,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: GymTheme.surface,
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(color: GymTheme.border),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    '$completedSets / $targetSets sets',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w800,
+                                      color: GymTheme.textPrimary,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${(progressRatio * 100).toInt()}%',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: GymTheme.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+
+                              // Progress Bar
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: LinearProgressIndicator(
+                                  value: progressRatio,
+                                  minHeight: 10,
+                                  backgroundColor: GymTheme.surfaceElevated,
+                                  valueColor: const AlwaysStoppedAnimation<Color>(GymTheme.primary),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+
+                              // Small pastel stat cards grid
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      padding: const EdgeInsets.all(14),
+                                      decoration: BoxDecoration(
+                                        color: GymTheme.lavender,
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '$completedSets',
+                                            style: const TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.w900,
+                                              color: GymTheme.textPrimary,
+                                            ),
+                                          ),
+                                          const Text(
+                                            'Sets completed',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                              color: GymTheme.textSecondary,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Container(
+                                      padding: const EdgeInsets.all(14),
+                                      decoration: BoxDecoration(
+                                        color: GymTheme.blue,
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: const [
+                                          Text(
+                                            '4',
+                                            style: TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.w900,
+                                              color: GymTheme.textPrimary,
+                                            ),
+                                          ),
+                                          Text(
+                                            'Exercises',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                              color: GymTheme.textSecondary,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, __) => const SizedBox.shrink(),
+                ),
+                const SizedBox(height: 24),
+
+                // Streak Card
+                progressAsync.when(
+                  data: (data) {
+                    final summary = data['summary'] ?? {};
+                    final streak = summary['streakDays'] ?? 12;
+
+                    return Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(22),
+                      decoration: BoxDecoration(
+                        color: GymTheme.peach,
+                        borderRadius: BorderRadius.circular(28),
+                        border: Border.all(color: GymTheme.border.withOpacity(0.5)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'CURRENT STREAK',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.2,
+                              color: GymTheme.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            '$streak DAYS',
+                            style: const TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w900,
+                              color: GymTheme.textPrimary,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Keep the momentum going',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: GymTheme.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Visual dot progress row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: List.generate(12, (index) {
+                              final bool isActive = index < streak;
+                              return Container(
+                                width: 14,
+                                height: 14,
+                                decoration: BoxDecoration(
+                                  color: isActive ? GymTheme.primary : GymTheme.surface.withOpacity(0.6),
+                                  shape: BoxShape.circle,
+                                ),
+                              );
+                            }),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, __) => const SizedBox.shrink(),
                 ),
                 const SizedBox(height: 28),
 
-                // Recent Personal Records Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'PERSONAL RECORDS (PRs)',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.2,
-                        color: GymTheme.textMuted,
-                      ),
-                    ),
-                  ],
+                // Personal Records Header
+                const Text(
+                  'PERSONAL RECORDS',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.2,
+                    color: GymTheme.textMuted,
+                  ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
 
                 // PR Cards Carousel
                 progressAsync.when(
                   data: (data) {
-                    final prs = (data['personalRecords'] as List?) ?? [];
-                    if (prs.isEmpty) return const SizedBox.shrink();
+                    final prs = (data['personalRecords'] as List?) ?? [
+                      {'exerciseName': 'Bench Press', 'maxWeight': 80.0, 'maxReps': 6},
+                      {'exerciseName': 'Barbell Squat', 'maxWeight': 120.0, 'maxReps': 5},
+                      {'exerciseName': 'Deadlift', 'maxWeight': 150.0, 'maxReps': 3},
+                    ];
 
                     return SizedBox(
-                      height: 110,
+                      height: 115,
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemCount: prs.length,
                         separatorBuilder: (_, __) => const SizedBox(width: 12),
                         itemBuilder: (context, index) {
                           final pr = prs[index];
+                          final colors = [GymTheme.yellow, GymTheme.lavender, GymTheme.mint, GymTheme.blue];
+                          final cardBg = colors[index % colors.length];
+
                           return Container(
-                            width: 170,
-                            padding: const EdgeInsets.all(14),
+                            width: 165,
+                            padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: GymTheme.surface,
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(color: GymTheme.border),
+                              color: cardBg,
+                              borderRadius: BorderRadius.circular(20),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.emoji_events,
-                                      color: GymTheme.primary,
-                                      size: 16,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Expanded(
-                                      child: Text(
-                                        pr['exerciseName'] ?? 'Bench Press',
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 13,
-                                          color: GymTheme.textPrimary,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                Text(
+                                  pr['exerciseName'] ?? 'Bench Press',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 13,
+                                    color: GymTheme.textPrimary,
+                                  ),
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
                                   '${pr['maxWeight']} kg',
                                   style: const TextStyle(
                                     fontSize: 22,
-                                    fontWeight: FontWeight.w800,
-                                    color: GymTheme.primary,
+                                    fontWeight: FontWeight.w900,
+                                    color: GymTheme.textPrimary,
                                   ),
                                 ),
                                 Text(
-                                  '× ${pr['maxReps']} reps',
+                                  '${pr['maxReps']} reps',
                                   style: const TextStyle(
                                     fontSize: 12,
-                                    color: GymTheme.textMuted,
+                                    fontWeight: FontWeight.w600,
+                                    color: GymTheme.textSecondary,
                                   ),
                                 ),
                               ],
@@ -454,10 +510,9 @@ class HomeScreen extends ConsumerWidget {
                       ),
                     );
                   },
-                  loading: () => const SizedBox(height: 110),
+                  loading: () => const SizedBox.shrink(),
                   error: (_, __) => const SizedBox.shrink(),
                 ),
-                const SizedBox(height: 24),
               ],
             ),
           ),
@@ -466,72 +521,69 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMetaBadge(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, size: 15, color: GymTheme.textMuted),
-        const SizedBox(width: 5),
-        Text(
-          text,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: GymTheme.textMuted,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCreateWorkoutPromptCard(BuildContext context) {
+  Widget _buildCreateWorkoutCard(BuildContext context) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: GymTheme.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: GymTheme.border),
+        color: GymTheme.mint,
+        borderRadius: BorderRadius.circular(28),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.add_task, size: 38, color: GymTheme.primary),
+          const Text(
+            'TODAY\'S TRAINING',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.2,
+              color: GymTheme.textPrimary,
+            ),
+          ),
           const SizedBox(height: 12),
           const Text(
-            'CREATE TODAY\'S WORKOUT',
+            'Create Workout Day',
             style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
               color: GymTheme.textPrimary,
             ),
           ),
           const SizedBox(height: 6),
           const Text(
-            'Enter which workout day you are doing today and pick your exercises.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: GymTheme.textMuted),
+            'Enter your workday name and add your exercises to begin.',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: GymTheme.textSecondary,
+            ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 20),
           SizedBox(
             width: double.infinity,
-            height: 48,
-            child: ElevatedButton.icon(
+            height: 52,
+            child: ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const CreateWorkoutScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const CreateWorkoutScreen()),
                 );
               },
-              icon: const Icon(Icons.add, color: Colors.black),
-              label: const Text(
-                'CREATE WORKOUT',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: GymTheme.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                elevation: 0,
+              ),
+              child: const Text(
+                'CREATE WORKOUT',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                  letterSpacing: 1.0,
+                ),
               ),
             ),
           ),
@@ -539,15 +591,5 @@ class HomeScreen extends ConsumerWidget {
       ),
     );
   }
-
-  Widget _buildSkeletonLoader() {
-    return Container(
-      height: 200,
-      decoration: BoxDecoration(
-        color: GymTheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: GymTheme.border),
-      ),
-    );
-  }
 }
+

@@ -8,31 +8,30 @@ class CompletionDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = summary['name'] ?? 'Chest Day';
+    final name = summary['name'] ?? 'Chest + Triceps';
     final totalVolumeKg = (summary['totalVolumeKg'] as num?)?.toDouble() ?? 4820.0;
     final durationMinutes = summary['durationMinutes'] ?? 52;
-    final totalSetsCompleted = summary['totalSetsCompleted'] ?? 15;
+    final totalSetsCompleted = summary['totalSetsCompleted'] ?? 18;
     final volumeDeltaKg = (summary['volumeDeltaKg'] as num?)?.toDouble() ?? 320.0;
-    final message = summary['message'] ?? 'Great session!';
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 36),
       decoration: const BoxDecoration(
-        color: GymTheme.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        color: GymTheme.mint,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Celebration Icon
+          // Large Soft Checkmark Badge
           Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: GymTheme.primaryGlow,
+            width: 72,
+            height: 72,
+            decoration: const BoxDecoration(
+              color: GymTheme.primary,
               shape: BoxShape.circle,
-              border: Border.all(color: GymTheme.primary, width: 2),
             ),
-            child: const Icon(Icons.celebration, size: 48, color: GymTheme.primary),
+            child: const Icon(Icons.check_rounded, size: 40, color: Colors.white),
           ),
           const SizedBox(height: 20),
 
@@ -40,25 +39,25 @@ class CompletionDialog extends StatelessWidget {
           const Text(
             'WORKOUT COMPLETE',
             style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
               letterSpacing: 1.2,
               color: GymTheme.textPrimary,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
             name.toUpperCase(),
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: GymTheme.primary),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: GymTheme.textSecondary, letterSpacing: 0.5),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
 
-          // Stats Summary Grid
+          // Core Stats Container
           Container(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(22),
             decoration: BoxDecoration(
-              color: GymTheme.surfaceElevated,
-              borderRadius: BorderRadius.circular(16),
+              color: GymTheme.surface,
+              borderRadius: BorderRadius.circular(24),
               border: Border.all(color: GymTheme.border),
             ),
             child: Column(
@@ -66,35 +65,29 @@ class CompletionDialog extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildStatCol('$totalSetsCompleted', 'Sets Done', Icons.layers),
-                    Container(height: 36, width: 1, color: GymTheme.border),
-                    _buildStatCol('${totalVolumeKg.toInt()} kg', 'Total Volume', Icons.fitness_center),
-                    Container(height: 36, width: 1, color: GymTheme.border),
-                    _buildStatCol('$durationMinutes min', 'Duration', Icons.access_time),
+                    _buildStatCol('$totalSetsCompleted', 'sets'),
+                    Container(height: 32, width: 1, color: GymTheme.border),
+                    _buildStatCol('${totalVolumeKg.toInt()} kg', 'volume'),
+                    Container(height: 32, width: 1, color: GymTheme.border),
+                    _buildStatCol('$durationMinutes min', 'duration'),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 18),
                 const Divider(color: GymTheme.border, height: 1),
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
 
                 // Volume Delta Badge
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      volumeDeltaKg >= 0 ? Icons.trending_up : Icons.trending_down,
-                      color: volumeDeltaKg >= 0 ? GymTheme.primary : GymTheme.warning,
-                      size: 18,
-                    ),
-                    const SizedBox(width: 8),
+                    const Icon(Icons.north_east_rounded, color: GymTheme.textPrimary, size: 18),
+                    const SizedBox(width: 6),
                     Text(
-                      volumeDeltaKg >= 0
-                          ? '↑ +${volumeDeltaKg.toInt()} kg vs last session'
-                          : '${volumeDeltaKg.toInt()} kg vs last session',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
+                      '↑ ${volumeDeltaKg.toInt()} kg vs previous workout',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
                         fontSize: 14,
-                        color: volumeDeltaKg >= 0 ? GymTheme.primary : GymTheme.warning,
+                        color: GymTheme.textPrimary,
                       ),
                     ),
                   ],
@@ -102,20 +95,12 @@ class CompletionDialog extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 20),
-
-          // Motivation Text
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14, color: GymTheme.textMuted, fontStyle: FontStyle.italic),
-          ),
           const SizedBox(height: 28),
 
           // Close Button
           SizedBox(
             width: double.infinity,
-            height: 52,
+            height: 56,
             child: ElevatedButton(
               onPressed: () {
                 Navigator.pop(context); // Close bottom sheet
@@ -123,12 +108,13 @@ class CompletionDialog extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: GymTheme.primary,
-                foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                elevation: 0,
               ),
               child: const Text(
-                'DONE',
-                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, letterSpacing: 1.0),
+                'CONTINUE',
+                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, letterSpacing: 1.2, color: Colors.white),
               ),
             ),
           ),
@@ -137,14 +123,20 @@ class CompletionDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCol(String val, String label, IconData icon) {
+  Widget _buildStatCol(String val, String label) {
     return Column(
       children: [
-        Icon(icon, size: 18, color: GymTheme.primary),
-        const SizedBox(height: 4),
-        Text(val, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: GymTheme.textPrimary)),
-        Text(label, style: const TextStyle(fontSize: 11, color: GymTheme.textMuted)),
+        Text(
+          val,
+          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: GymTheme.textPrimary),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: GymTheme.textSecondary),
+        ),
       ],
     );
   }
 }
+
