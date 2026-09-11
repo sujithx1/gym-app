@@ -42,12 +42,18 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = const [
-    HomeScreen(),
-    ExerciseLibraryScreen(),
-    ProgressScreen(),
-    ProfileScreen(),
-  ];
+  List<Widget> get _pages => [
+        HomeScreen(
+          onNavigateTab: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+        ),
+        const ExerciseLibraryScreen(),
+        const ProgressScreen(),
+        const ProfileScreen(),
+      ];
 
   @override
   Widget build(BuildContext context) {
