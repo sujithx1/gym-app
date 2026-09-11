@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/gym_theme.dart';
 import '../../core/providers/app_providers.dart';
 import '../../core/widgets/ios_button.dart';
+import '../../core/widgets/treadmill_loading.dart';
 import 'completion_dialog.dart';
 
 class TodayWorkoutScreen extends ConsumerStatefulWidget {
@@ -595,7 +596,11 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                 width: double.infinity,
                 onPressed: _isSaving ? null : _completeWorkout,
                 child: _isSaving
-                    ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
+                    ? const TreadmillLoadingWidget(
+                        size: 28,
+                        showGlassCard: false,
+                        color: Colors.white,
+                      )
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/gym_theme.dart';
 import 'core/providers/app_providers.dart';
 import 'core/widgets/liquid_background.dart';
+import 'core/widgets/treadmill_loading.dart';
 import 'features/auth/login_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/exercises/exercise_library_screen.dart';
@@ -25,6 +26,9 @@ class GymWorkoutApp extends ConsumerWidget {
       title: 'Gym Workout Tracker',
       debugShowCheckedModeBanner: false,
       theme: GymTheme.lightTheme,
+      builder: (context, child) {
+        return GlobalTreadmillOverlay(child: child ?? const SizedBox.shrink());
+      },
       home: authState.isAuthenticated
           ? const MainNavigationScreen()
           : const LoginScreen(),
@@ -43,17 +47,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
 
   List<Widget> get _pages => [
-        HomeScreen(
-          onNavigateTab: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-        ),
-        const ExerciseLibraryScreen(),
-        const ProgressScreen(),
-        const ProfileScreen(),
-      ];
+    HomeScreen(
+      onNavigateTab: (index) {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+    ),
+    const ExerciseLibraryScreen(),
+    const ProgressScreen(),
+    const ProfileScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -73,13 +77,21 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             decoration: BoxDecoration(
               color: GymTheme.surface,
               borderRadius: BorderRadius.circular(34),
-              border: Border.all(color: GymTheme.border, width: 1.2),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.7),
+                width: 1.5,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.08),
                   blurRadius: 24,
                   spreadRadius: 0,
                   offset: const Offset(0, 8),
+                ),
+                BoxShadow(
+                  color: GymTheme.periwinkle.withValues(alpha: 0.15),
+                  blurRadius: 16,
+                  spreadRadius: 2,
                 ),
               ],
             ),
@@ -144,12 +156,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
           decoration: BoxDecoration(
             color: isSelected ? GymTheme.primary : Colors.transparent,
-            borderRadius: BorderRadius.circular(26),
+            borderRadius: BorderRadius.circular(24),
+            border: isSelected
+                ? Border.all(
+                    color: Colors.white.withValues(alpha: 0.35),
+                    width: 1.2,
+                  )
+                : null,
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: GymTheme.primary.withValues(alpha: 0.25),
-                      blurRadius: 10,
+                      color: GymTheme.primary.withValues(alpha: 0.3),
+                      blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
                   ]

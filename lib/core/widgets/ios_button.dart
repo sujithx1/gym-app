@@ -72,7 +72,8 @@ class _IosButtonState extends State<IosButton> with SingleTickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-    final br = widget.borderRadius ?? BorderRadius.circular(22);
+    final br = widget.borderRadius ?? BorderRadius.circular(24);
+    final bool isEnabled = widget.onPressed != null;
 
     return AnimatedBuilder(
       animation: _scaleAnimation,
@@ -87,15 +88,27 @@ class _IosButtonState extends State<IosButton> with SingleTickerProviderStateMix
               height: widget.height,
               width: widget.width,
               decoration: BoxDecoration(
-                color: widget.onPressed != null ? widget.backgroundColor : GymTheme.border,
+                color: isEnabled ? widget.backgroundColor : GymTheme.border,
                 borderRadius: br,
-                border: widget.borderSide != null ? Border.fromBorderSide(widget.borderSide!) : null,
-                boxShadow: widget.onPressed != null && widget.backgroundColor != Colors.transparent
+                border: widget.borderSide != null
+                    ? Border.fromBorderSide(widget.borderSide!)
+                    : Border.all(
+                        color: Colors.white.withValues(alpha: isEnabled ? 0.35 : 0.15),
+                        width: 1.5,
+                      ),
+                boxShadow: isEnabled && widget.backgroundColor != Colors.transparent
                     ? [
                         BoxShadow(
-                          color: widget.backgroundColor.withValues(alpha: 0.25),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
+                          color: widget.backgroundColor.withValues(alpha: 0.3),
+                          blurRadius: 16,
+                          spreadRadius: 0,
+                          offset: const Offset(0, 6),
+                        ),
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.06),
+                          blurRadius: 8,
+                          spreadRadius: -2,
+                          offset: const Offset(0, 2),
                         ),
                       ]
                     : null,

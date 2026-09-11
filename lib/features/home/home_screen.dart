@@ -24,13 +24,11 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: GymTheme.background,
       body: SafeArea(
-        child: RefreshIndicator(
+        child: TreadmillRefreshIndicator(
           onRefresh: () async {
             ref.invalidate(todayWorkoutProvider);
             ref.invalidate(progressOverviewProvider);
           },
-          color: GymTheme.primary,
-          backgroundColor: GymTheme.surface,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 110),
@@ -514,104 +512,14 @@ class HomeScreen extends ConsumerWidget {
     required Color glowColor,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
+    return _SquircleGlassGridCard(
+      tag: tag,
+      title: title,
+      subtitle: subtitle,
+      icon: icon,
+      backgroundColor: backgroundColor,
+      glowColor: glowColor,
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.6),
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: backgroundColor.withValues(alpha: 0.5),
-              blurRadius: 18,
-              spreadRadius: 0,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  width: 34,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.7),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    icon,
-                    size: 18,
-                    color: GymTheme.primary,
-                  ),
-                ),
-                Container(
-                  width: 30,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    color: GymTheme.primary.withValues(alpha: 0.08),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.north_east_rounded,
-                    size: 15,
-                    color: GymTheme.primary,
-                  ),
-                ),
-              ],
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  tag,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.8,
-                    color: GymTheme.textPrimary.withValues(alpha: 0.6),
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w900,
-                    color: GymTheme.textPrimary,
-                    height: 1.15,
-                    letterSpacing: -0.3,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: GymTheme.textSecondary.withValues(alpha: 0.85),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -633,7 +541,12 @@ class HomeScreen extends ConsumerWidget {
           backgroundColor: GymTheme.periwinkle,
           glowColor: GymTheme.periwinkleDark,
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateWorkoutScreen()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CreateWorkoutScreen(),
+              ),
+            );
           },
         ),
         _buildGlowingGridCard(
@@ -649,6 +562,188 @@ class HomeScreen extends ConsumerWidget {
           },
         ),
       ],
+    );
+  }
+}
+
+/// Springy, tactile squircle glass card matching iOS continuous superellipse icon shape
+class _SquircleGlassGridCard extends StatefulWidget {
+  final String tag;
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Color backgroundColor;
+  final Color glowColor;
+  final VoidCallback onTap;
+
+  const _SquircleGlassGridCard({
+    required this.tag,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.backgroundColor,
+    required this.glowColor,
+    required this.onTap,
+  });
+
+  @override
+  State<_SquircleGlassGridCard> createState() => _SquircleGlassGridCardState();
+}
+
+class _SquircleGlassGridCardState extends State<_SquircleGlassGridCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+      reverseDuration: const Duration(milliseconds: 150),
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.94).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: GestureDetector(
+            onTapDown: (_) => _controller.forward(),
+            onTapUp: (_) {
+              _controller.reverse();
+              widget.onTap();
+            },
+            onTapCancel: () => _controller.reverse(),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: widget.backgroundColor,
+                borderRadius: BorderRadius.circular(26),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.8),
+                  width: 1.8,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: widget.backgroundColor.withValues(alpha: 0.45),
+                    blurRadius: 18,
+                    spreadRadius: 0,
+                    offset: const Offset(0, 8),
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 8,
+                    spreadRadius: -2,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Layered Squircle Icon Badge
+                      Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.85),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            width: 1.2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.06),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          widget.icon,
+                          size: 20,
+                          color: GymTheme.primary,
+                        ),
+                      ),
+                      // Arrow Badge
+                      Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: GymTheme.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.north_east_rounded,
+                          size: 15,
+                          color: GymTheme.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.tag,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.8,
+                          color: GymTheme.textPrimary.withValues(alpha: 0.6),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        widget.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w900,
+                          color: GymTheme.textPrimary,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                      Text(
+                        widget.subtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: GymTheme.textSecondary.withValues(alpha: 0.8),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

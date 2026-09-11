@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/gym_theme.dart';
 import '../../core/providers/app_providers.dart';
+import '../../core/widgets/treadmill_loading.dart';
 
 class ProgressScreen extends ConsumerStatefulWidget {
   const ProgressScreen({super.key});
@@ -22,12 +23,10 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
     return Scaffold(
       backgroundColor: GymTheme.background,
       body: SafeArea(
-        child: RefreshIndicator(
+        child: TreadmillRefreshIndicator(
           onRefresh: () async {
             ref.invalidate(progressOverviewProvider);
           },
-          color: GymTheme.primary,
-          backgroundColor: GymTheme.surface,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 110),

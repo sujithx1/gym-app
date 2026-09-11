@@ -1,8 +1,34 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../networking/api_client.dart';
 
+class ApiLoadingNotifier extends StateNotifier<int> {
+  ApiLoadingNotifier() : super(0);
+
+  void startLoading() {
+    state = state + 1;
+  }
+
+  void stopLoading() {
+    if (state > 0) {
+      state = state - 1;
+    }
+  }
+
+  void reset() {
+    state = 0;
+  }
+}
+
+final apiLoadingProvider = StateNotifierProvider<ApiLoadingNotifier, int>((ref) {
+  return ApiLoadingNotifier();
+});
+
 final apiClientProvider = Provider<ApiClient>((ref) {
-  return ApiClient();
+  final loadingNotifier = ref.watch(apiLoadingProvider.notifier);
+  return ApiClient(
+    onRequestStart: () => loadingNotifier.startLoading(),
+    onRequestEnd: () => loadingNotifier.stopLoading(),
+  );
 });
 
 class AuthState {

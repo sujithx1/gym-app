@@ -312,12 +312,10 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
 
             // Exercises List
             Expanded(
-              child: RefreshIndicator(
+              child: TreadmillRefreshIndicator(
                 onRefresh: () async {
                   ref.invalidate(exercisesProvider);
                 },
-                color: GymTheme.primary,
-                backgroundColor: GymTheme.surface,
                 child: exercisesAsync.when(
                   data: (list) {
                     var filtered = list;

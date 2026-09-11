@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/gym_theme.dart';
 import '../../core/providers/app_providers.dart';
 import '../../core/widgets/liquid_background.dart';
+import '../../core/widgets/treadmill_loading.dart';
 import '../../core/widgets/ios_button.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -229,10 +230,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         width: double.infinity,
                         onPressed: authState.isLoading ? null : _handleLogin,
                         child: authState.isLoading
-                            ? const SizedBox(
-                                height: 22,
-                                width: 22,
-                                child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+                            ? const TreadmillLoadingWidget(
+                                size: 28,
+                                showGlassCard: false,
+                                color: Colors.white,
                               )
                             : const Text(
                                 'SIGN IN',
