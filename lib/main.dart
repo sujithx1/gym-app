@@ -59,10 +59,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
       bottomNavigationBar: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
           child: Container(
+            width: double.infinity,
             height: 68,
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
             decoration: BoxDecoration(
               color: GymTheme.surface,
               borderRadius: BorderRadius.circular(34),
@@ -70,18 +71,43 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.08),
-                  blurRadius: 20,
-                  offset: const Offset(0, 6),
+                  blurRadius: 24,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
-            child: Row(
-              children: [
-                _buildNavItem(0, Icons.grid_view_rounded, 'Home'),
-                _buildNavItem(1, Icons.fitness_center_rounded, 'Workout'),
-                _buildNavItem(2, Icons.show_chart_rounded, 'Progress'),
-                _buildNavItem(3, Icons.person_rounded, 'Profile'),
-              ],
+            child: SizedBox.expand(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _buildNavItem(
+                    0,
+                    Icons.grid_view_outlined,
+                    Icons.grid_view_rounded,
+                    'Home',
+                  ),
+                  _buildNavItem(
+                    1,
+                    Icons.fitness_center_outlined,
+                    Icons.fitness_center_rounded,
+                    'Workout',
+                  ),
+                  _buildNavItem(
+                    2,
+                    Icons.show_chart_rounded,
+                    Icons.insights_rounded,
+                    'Progress',
+                  ),
+                  _buildNavItem(
+                    3,
+                    Icons.person_outline_rounded,
+                    Icons.person_rounded,
+                    'Profile',
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -89,7 +115,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  Widget _buildNavItem(int index, IconData icon, String label) {
+  Widget _buildNavItem(
+    int index,
+    IconData icon,
+    IconData activeIcon,
+    String label,
+  ) {
     final bool isSelected = _currentIndex == index;
     return Expanded(
       child: GestureDetector(
@@ -102,25 +133,28 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeInOut,
-          margin: const EdgeInsets.symmetric(horizontal: 3),
+          width: double.infinity,
+          height: double.infinity,
+          margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
           decoration: BoxDecoration(
             color: isSelected ? GymTheme.primary : Colors.transparent,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(26),
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: GymTheme.primary.withValues(alpha: 0.2),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
+                      color: GymTheme.primary.withValues(alpha: 0.25),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
                   ]
                 : null,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Icon(
-                icon,
+                isSelected ? activeIcon : icon,
                 size: 20,
                 color: isSelected ? Colors.white : GymTheme.textSecondary,
               ),
@@ -131,9 +165,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: isSelected ? Colors.white : GymTheme.textSecondary,
-                  fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
+                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                   fontSize: 11,
-                  letterSpacing: 0.2,
+                  letterSpacing: 0.1,
                 ),
               ),
             ],
