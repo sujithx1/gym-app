@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/gym_theme.dart';
 import '../../core/providers/app_providers.dart';
 import '../../core/widgets/treadmill_loading.dart';
+import '../../core/widgets/ios_welcome_header.dart';
 import '../workout/today_workout_screen.dart';
 import '../workout/create_workout_screen.dart';
 
@@ -35,62 +36,11 @@ class HomeScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Top Header (Editorial Tag + Title + Avatar)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'DAILY OVERVIEW',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1.2,
-                            color: GymTheme.textMuted,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Hello, ${authState.username ?? 'Sujith'} 👋',
-                          style: const TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w900,
-                            color: GymTheme.textPrimary,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    // User avatar badge with liquid glass border
-                    Container(
-                      width: 46,
-                      height: 46,
-                      decoration: BoxDecoration(
-                        color: GymTheme.surface,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: GymTheme.border, width: 1.5),
-                        boxShadow: [
-                          BoxShadow(
-                            color: GymTheme.periwinkle.withValues(alpha: 0.3),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        (authState.username ?? 'S')[0].toUpperCase(),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 18,
-                          color: GymTheme.textPrimary,
-                        ),
-                      ),
-                    ),
-                  ],
+                // Top iOS Animated Greeting Header
+                IosWelcomeHeader(
+                  key: ValueKey(authState.username),
+                  username: authState.username ?? 'Sujith',
+                  onAvatarTap: () => onNavigateTab?.call(3),
                 ),
                 const SizedBox(height: 24),
 

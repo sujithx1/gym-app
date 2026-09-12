@@ -1,5 +1,7 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+
 import '../theme/gym_theme.dart';
 
 /// Animated background that renders soft, flowing organic liquid shapes on all sides
@@ -17,7 +19,8 @@ class LiquidBackground extends StatefulWidget {
   State<LiquidBackground> createState() => _LiquidBackgroundState();
 }
 
-class _LiquidBackgroundState extends State<LiquidBackground> with SingleTickerProviderStateMixin {
+class _LiquidBackgroundState extends State<LiquidBackground>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -42,9 +45,7 @@ class _LiquidBackgroundState extends State<LiquidBackground> with SingleTickerPr
     return Stack(
       children: [
         // Background Base
-        Positioned.fill(
-          child: Container(color: GymTheme.background),
-        ),
+        Positioned.fill(child: Container(color: GymTheme.background)),
 
         // Animated Liquid Blob Canvas on Top, Sides, & Bottom
         Positioned.fill(
@@ -150,7 +151,8 @@ class LiquidCard extends StatefulWidget {
   State<LiquidCard> createState() => _LiquidCardState();
 }
 
-class _LiquidCardState extends State<LiquidCard> with SingleTickerProviderStateMixin {
+class _LiquidCardState extends State<LiquidCard>
+    with SingleTickerProviderStateMixin {
   late AnimationController _glowController;
 
   @override
@@ -193,7 +195,9 @@ class _LiquidCardState extends State<LiquidCard> with SingleTickerProviderStateM
               ),
               boxShadow: [
                 BoxShadow(
-                  color: widget.accentColor.withValues(alpha: 0.25 + glowVal * 0.2),
+                  color: widget.accentColor.withValues(
+                    alpha: 0.25 + glowVal * 0.2,
+                  ),
                   blurRadius: 16 + glowVal * 10,
                   spreadRadius: -2,
                   offset: const Offset(0, 4),
@@ -222,10 +226,7 @@ class _LiquidCardState extends State<LiquidCard> with SingleTickerProviderStateM
                   ),
 
                   // Card Content
-                  Padding(
-                    padding: widget.padding,
-                    child: widget.child,
-                  ),
+                  Padding(padding: widget.padding, child: widget.child),
                 ],
               ),
             ),
