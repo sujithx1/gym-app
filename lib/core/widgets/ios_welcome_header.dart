@@ -50,6 +50,9 @@ class _IosWelcomeHeaderState extends State<IosWelcomeHeader>
         parent: _animController,
         curve: const Interval(0.2, 1.0, curve: Curves.easeInOut),
       ),
+
+
+
     );
 
     _animController.forward();
