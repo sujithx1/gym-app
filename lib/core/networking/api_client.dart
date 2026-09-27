@@ -11,12 +11,16 @@ class ApiClient {
 
   ApiClient({this.onRequestStart, this.onRequestEnd});
 
-  Future<T> _trackRequest<T>(Future<T> Function() fn) async {
-    onRequestStart?.call();
+  Future<T> _trackRequest<T>(Future<T> Function() fn, {bool showGlobalLoading = true}) async {
+    if (showGlobalLoading) {
+      onRequestStart?.call();
+    }
     try {
       return await fn();
     } finally {
-      onRequestEnd?.call();
+      if (showGlobalLoading) {
+        onRequestEnd?.call();
+      }
     }
   }
 
@@ -68,7 +72,7 @@ class ApiClient {
 
   // --- Workouts API ---
   Future<Map<String, dynamic>> getTodayWorkout() async {
-    return _trackRequest(() async {
+    return _trackRequest(showGlobalLoading: false, () async {
       try {
         final res = await http.get(
           Uri.parse('$baseUrl/workouts/today'),
@@ -168,7 +172,7 @@ class ApiClient {
 
   // --- Progress & Stats APIs ---
   Future<Map<String, dynamic>> getProgressOverview() async {
-    return _trackRequest(() async {
+    return _trackRequest(showGlobalLoading: false, () async {
       try {
         final res = await http.get(
           Uri.parse('$baseUrl/progress/overview'),
@@ -196,7 +200,7 @@ class ApiClient {
 
   // --- Exercise Library ---
   Future<List<dynamic>> getExercises([String? muscleGroup]) async {
-    return _trackRequest(() async {
+    return _trackRequest(showGlobalLoading: false, () async {
       try {
         final Uri uri = muscleGroup != null && muscleGroup.isNotEmpty
             ? Uri.parse('$baseUrl/exercises?muscleGroup=$muscleGroup')

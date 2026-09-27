@@ -129,7 +129,8 @@ class _TreadmillLoadingWidgetState extends State<TreadmillLoadingWidget>
 
 /// Global loading overlay.
 ///
-/// Shows ONLY the animated running person while an API request is active.
+/// Shows ONLY the animated running person while an active blocking API request is in progress.
+/// Supports tap-to-dismiss barrier and safety auto-timeout.
 class GlobalTreadmillOverlay extends ConsumerStatefulWidget {
   final Widget child;
 
@@ -142,68 +143,87 @@ class GlobalTreadmillOverlay extends ConsumerStatefulWidget {
 
 class _GlobalTreadmillOverlayState
     extends ConsumerState<GlobalTreadmillOverlay> {
-  bool _showOverlay = false;
-  Timer? _debounceTimer;
+  Timer? _safetyTimeoutTimer;
 
   @override
   void dispose() {
-    _debounceTimer?.cancel();
+    _safetyTimeoutTimer?.cancel();
     super.dispose();
   }
 
-  void _onLoadingStateChanged(int activeRequests) {
-    final bool isLoading = activeRequests > 0;
-
-    if (isLoading) {
-      // Anti-flicker delay.
-      if (!_showOverlay && _debounceTimer == null) {
-        _debounceTimer = Timer(const Duration(milliseconds: 200), () {
-          _debounceTimer = null;
-
-          if (mounted && ref.read(apiLoadingProvider) > 0) {
-            setState(() {
-              _showOverlay = true;
-            });
-          }
-        });
-      }
-    } else {
-      // Hide immediately when all requests finish.
-      _debounceTimer?.cancel();
-      _debounceTimer = null;
-
-      if (_showOverlay) {
-        setState(() {
-          _showOverlay = false;
-        });
-      }
-    }
+  void _dismissOverlay() {
+    _safetyTimeoutTimer?.cancel();
+    _safetyTimeoutTimer = null;
+    ref.read(apiLoadingProvider.notifier).reset();
   }
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<int>(apiLoadingProvider, (previous, next) {
-      _onLoadingStateChanged(next);
-    });
+    final activeRequests = ref.watch(apiLoadingProvider);
+    final bool showOverlay = activeRequests > 0;
+
+    if (showOverlay) {
+      // Safety auto-dismiss after 4 seconds to prevent stuck overlays
+      _safetyTimeoutTimer ??= Timer(const Duration(seconds: 4), () {
+        if (mounted) {
+          _dismissOverlay();
+        }
+      });
+    } else {
+      _safetyTimeoutTimer?.cancel();
+      _safetyTimeoutTimer = null;
+    }
 
     return Stack(
       children: [
         widget.child,
 
-        if (_showOverlay)
+        if (showOverlay)
           Positioned.fill(
-            child: AbsorbPointer(
-              absorbing: true,
+            child: GestureDetector(
+              onTap: _dismissOverlay,
+              behavior: HitTestBehavior.opaque,
               child: BackdropFilter(
                 filter: ui.ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
                 child: Container(
-                  color: Colors.black.withValues(alpha: 0.3),
+                  color: Colors.black.withValues(alpha: 0.35),
                   alignment: Alignment.center,
+                  //   child: Column(
+                  //     mainAxisSize: MainAxisSize.min,
+                  //     children: [
+                  //       const TreadmillLoadingWidget(
+                  //         size: 70,
+                  //         showGlassCard: false,
+                  //         color: Colors.white,
+                  //       ),
+                  //       const SizedBox(height: 16),
+                  //       Container(
+                  //         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  //         decoration: BoxDecoration(
+                  //           color: Colors.black.withValues(alpha: 0.4),
+                  //           borderRadius: BorderRadius.circular(20),
+                  //           border: Border.all(
+                  //             color: Colors.white.withValues(alpha: 0.2),
+                  //             width: 1,
+                  //           ),
+                  //         ),
+                  //         child: const Text(
+                  //           'Tap anywhere to dismiss',
+                  //           style: TextStyle(
+                  //             color: Colors.white70,
+                  //             fontSize: 11,
+                  //             fontWeight: FontWeight.w600,
+                  //             letterSpacing: 0.3,
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
 
-                  // ONLY RUNNING PERSON.
-                  child: const TreadmillLoadingWidget(
+                  child: TreadmillLoadingWidget(
                     size: 70,
                     showGlassCard: false,
+                    color: Colors.white,
                   ),
                 ),
               ),
