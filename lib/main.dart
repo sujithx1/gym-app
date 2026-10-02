@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -43,7 +45,6 @@ class MainNavigationScreen extends StatefulWidget {
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
 
-
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
 
@@ -72,60 +73,103 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
           child: Container(
-            width: double.infinity,
             height: 68,
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
             decoration: BoxDecoration(
-              color: GymTheme.surface,
               borderRadius: BorderRadius.circular(34),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.7),
-                width: 1.5,
-              ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.08),
-                  blurRadius: 24,
-                  spreadRadius: 0,
-                  offset: const Offset(0, 8),
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 28,
+                  spreadRadius: -2,
+                  offset: const Offset(0, 10),
                 ),
                 BoxShadow(
-                  color: GymTheme.periwinkle.withValues(alpha: 0.15),
-                  blurRadius: 16,
-                  spreadRadius: 2,
+                  color: GymTheme.periwinkle.withValues(alpha: 0.18),
+                  blurRadius: 20,
+                  spreadRadius: 1,
                 ),
               ],
             ),
-            child: SizedBox.expand(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _buildNavItem(
-                    0,
-                    Icons.grid_view_outlined,
-                    Icons.grid_view_rounded,
-                    'Home',
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(34),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 6,
                   ),
-                  _buildNavItem(
-                    1,
-                    Icons.fitness_center_outlined,
-                    Icons.fitness_center_rounded,
-                    'Workout',
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(34),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.white.withValues(alpha: 0.72),
+                        Colors.white.withValues(alpha: 0.42),
+                        GymTheme.periwinkle.withValues(alpha: 0.18),
+                      ],
+                      stops: const [0.0, 0.55, 1.0],
+                    ),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.85),
+                      width: 1.4,
+                    ),
                   ),
-                  _buildNavItem(
-                    2,
-                    Icons.show_chart_rounded,
-                    Icons.insights_rounded,
-                    'Progress',
+                  child: Stack(
+                    children: [
+                      // Soft liquid sheen highlight
+                      Positioned(
+                        top: 0,
+                        left: 16,
+                        right: 16,
+                        height: 1.5,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(2),
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.white.withValues(alpha: 0.0),
+                                Colors.white.withValues(alpha: 0.9),
+                                Colors.white.withValues(alpha: 0.0),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          _buildNavItem(
+                            0,
+                            Icons.grid_view_outlined,
+                            Icons.grid_view_rounded,
+                            'Home',
+                          ),
+                          _buildNavItem(
+                            1,
+                            Icons.fitness_center_outlined,
+                            Icons.fitness_center_rounded,
+                            'Workout',
+                          ),
+                          _buildNavItem(
+                            2,
+                            Icons.show_chart_rounded,
+                            Icons.insights_rounded,
+                            'Progress',
+                          ),
+                          _buildNavItem(
+                            3,
+                            Icons.person_outline_rounded,
+                            Icons.person_rounded,
+                            'Profile',
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  _buildNavItem(
-                    3,
-                    Icons.person_outline_rounded,
-                    Icons.person_rounded,
-                    'Profile',
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -150,25 +194,27 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         },
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut,
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
           width: double.infinity,
           height: double.infinity,
           margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
           decoration: BoxDecoration(
-            color: isSelected ? GymTheme.primary : Colors.transparent,
+            color: isSelected
+                ? GymTheme.primary.withValues(alpha: 0.92)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(24),
             border: isSelected
                 ? Border.all(
-                    color: Colors.white.withValues(alpha: 0.35),
+                    color: Colors.white.withValues(alpha: 0.4),
                     width: 1.2,
                   )
                 : null,
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: GymTheme.primary.withValues(alpha: 0.3),
-                      blurRadius: 12,
+                      color: GymTheme.primary.withValues(alpha: 0.28),
+                      blurRadius: 14,
                       offset: const Offset(0, 4),
                     ),
                   ]
