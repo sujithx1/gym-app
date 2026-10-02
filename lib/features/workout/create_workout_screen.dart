@@ -71,16 +71,31 @@ class _CreateWorkoutScreenState extends ConsumerState<CreateWorkoutScreen> {
     }
 
     setState(() {
-      _selectedExercises.add({
+      _selectedExercises.add(<String, dynamic>{
         'id': id,
         'name': exercise['name'] ?? '',
         'muscleGroup':
             exercise['muscle_group'] ?? exercise['muscleGroup'] ?? 'General',
         'equipment': exercise['equipment'] ?? 'Barbell',
-        'sets': [
-          {'setNumber': 1, 'weight': 0.0, 'reps': 0, 'completed': false},
-          {'setNumber': 2, 'weight': 0.0, 'reps': 0, 'completed': false},
-          {'setNumber': 3, 'weight': 0.0, 'reps': 0, 'completed': false},
+        'sets': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'setNumber': 1,
+            'weight': 0.0,
+            'reps': 0,
+            'completed': false,
+          },
+          <String, dynamic>{
+            'setNumber': 2,
+            'weight': 0.0,
+            'reps': 0,
+            'completed': false,
+          },
+          <String, dynamic>{
+            'setNumber': 3,
+            'weight': 0.0,
+            'reps': 0,
+            'completed': false,
+          },
         ],
       });
     });
@@ -102,15 +117,30 @@ class _CreateWorkoutScreenState extends ConsumerState<CreateWorkoutScreen> {
 
     if (!mounted) return;
     setState(() {
-      _selectedExercises.add({
+      _selectedExercises.add(<String, dynamic>{
         'id': exId,
         'name': name.trim(),
         'muscleGroup': muscleGroup,
         'equipment': 'Custom',
-        'sets': [
-          {'setNumber': 1, 'weight': 0.0, 'reps': 0, 'completed': false},
-          {'setNumber': 2, 'weight': 0.0, 'reps': 0, 'completed': false},
-          {'setNumber': 3, 'weight': 0.0, 'reps': 0, 'completed': false},
+        'sets': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'setNumber': 1,
+            'weight': 0.0,
+            'reps': 0,
+            'completed': false,
+          },
+          <String, dynamic>{
+            'setNumber': 2,
+            'weight': 0.0,
+            'reps': 0,
+            'completed': false,
+          },
+          <String, dynamic>{
+            'setNumber': 3,
+            'weight': 0.0,
+            'reps': 0,
+            'completed': false,
+          },
         ],
       });
     });
@@ -123,9 +153,12 @@ class _CreateWorkoutScreenState extends ConsumerState<CreateWorkoutScreen> {
 
   void _addSetToExercise(int exIndex) {
     setState(() {
-      final sets = _selectedExercises[exIndex]['sets'] as List;
-      final lastSet = sets.isNotEmpty ? sets.last : {'weight': 0.0, 'reps': 0};
-      sets.add({
+      final sets =
+          _selectedExercises[exIndex]['sets'] as List<Map<String, dynamic>>;
+      final lastSet = sets.isNotEmpty
+          ? sets.last
+          : <String, dynamic>{'weight': 0.0, 'reps': 0};
+      sets.add(<String, dynamic>{
         'setNumber': sets.length + 1,
         'weight': lastSet['weight'],
         'reps': lastSet['reps'],
@@ -136,7 +169,8 @@ class _CreateWorkoutScreenState extends ConsumerState<CreateWorkoutScreen> {
 
   void _removeSetFromExercise(int exIndex, int setIndex) {
     setState(() {
-      final sets = _selectedExercises[exIndex]['sets'] as List;
+      final sets =
+          _selectedExercises[exIndex]['sets'] as List<Map<String, dynamic>>;
       if (sets.length > 1) {
         sets.removeAt(setIndex);
         for (int i = 0; i < sets.length; i++) {

@@ -53,9 +53,11 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
         'sess_${DateTime.now().millisecondsSinceEpoch}';
 
     final rawExercises = widget.todayData['exercises'] as List? ?? [];
-    _exercises = rawExercises.asMap().entries.map((entry) {
+    _exercises = rawExercises.asMap().entries.map<Map<String, dynamic>>((
+      entry,
+    ) {
       final idx = entry.key;
-      final e = entry.value;
+      final e = Map<String, dynamic>.from(entry.value as Map);
       final targetSets = e['targetSets'] ?? 3;
       final targetWeight = (e['targetWeight'] as num?)?.toDouble() ?? 60.0;
       final targetReps = e['targetReps'] ?? 10;
@@ -66,9 +68,13 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
           ? existingSets.length
           : (targetSets > 0 ? targetSets : 3);
 
-      final sets = List.generate(setsCount, (i) {
-        final last = i < lastPerf.length ? lastPerf[i] : null;
-        final exist = i < existingSets.length ? existingSets[i] : null;
+      final sets = List<Map<String, dynamic>>.generate(setsCount, (i) {
+        final last = i < lastPerf.length
+            ? Map<String, dynamic>.from(lastPerf[i] as Map)
+            : null;
+        final exist = i < existingSets.length
+            ? Map<String, dynamic>.from(existingSets[i] as Map)
+            : null;
 
         double w = exist != null
             ? (exist['weight'] as num).toDouble()
@@ -76,28 +82,32 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                   ? (last['weight'] as num).toDouble()
                   : targetWeight);
         int r = exist != null
-            ? (exist['reps'] as int)
-            : (last != null ? last['reps'] as int : targetReps);
+            ? (exist['reps'] as num).toInt()
+            : (last != null
+                  ? (last['reps'] as num).toInt()
+                  : targetReps as int);
 
         if (w == 0) w = 60.0;
         if (r == 0) r = 10;
 
-        return {
+        return <String, dynamic>{
           'setNumber': i + 1,
           'weight': w,
           'reps': r,
-          'completed': exist != null ? (exist['completed'] as bool) : false,
+          'completed': exist != null ? (exist['completed'] == true) : false,
           'lastWeight': last != null
               ? (last['weight'] as num).toDouble()
               : (w > 0 ? w : 60.0),
-          'lastReps': last != null ? last['reps'] as int : (r > 0 ? r : 10),
+          'lastReps': last != null
+              ? (last['reps'] as num).toInt()
+              : (r > 0 ? r : 10),
         };
       });
 
-      return {
+      return <String, dynamic>{
         'id': e['id'],
         'name': e['name'],
-        'muscleGroup': e['muscleGroup'] ?? 'CHEST',
+        'muscleGroup': e['muscleGroup'] ?? e['muscle_group'] ?? 'CHEST',
         'equipment': e['equipment'] ?? 'Barbell',
         'color': _pastelColors[idx % _pastelColors.length],
         'sets': sets,
@@ -125,8 +135,9 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
   }
 
   void _toggleSetCompleted(int exIndex, int setIndex) async {
-    final setItem = _exercises[exIndex]['sets'][setIndex];
-    final bool newStatus = !(setItem['completed'] as bool);
+    final setItem =
+        (_exercises[exIndex]['sets'] as List)[setIndex] as Map<String, dynamic>;
+    final bool newStatus = !(setItem['completed'] == true);
 
     setState(() {
       setItem['completed'] = newStatus;
@@ -141,19 +152,19 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
       sessionId: _sessionId,
       exerciseId: _exercises[exIndex]['id'],
       setNumber: setItem['setNumber'],
-      weight: setItem['weight'],
-      reps: setItem['reps'],
+      weight: (setItem['weight'] as num).toDouble(),
+      reps: (setItem['reps'] as num).toInt(),
       completed: newStatus,
     );
   }
 
   void _addSet(int exIndex) {
     setState(() {
-      final sets = _exercises[exIndex]['sets'] as List;
+      final sets = _exercises[exIndex]['sets'] as List<Map<String, dynamic>>;
       final lastSet = sets.isNotEmpty
           ? sets.last
-          : {'weight': 60.0, 'reps': 10};
-      sets.add({
+          : <String, dynamic>{'weight': 60.0, 'reps': 10};
+      sets.add(<String, dynamic>{
         'setNumber': sets.length + 1,
         'weight': lastSet['weight'],
         'reps': lastSet['reps'],
@@ -166,16 +177,20 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
 
   void _updateSetWeight(int exIndex, int setIndex, double delta) {
     setState(() {
-      final setItem = _exercises[exIndex]['sets'][setIndex];
-      final current = (setItem['weight'] as double);
+      final setItem =
+          (_exercises[exIndex]['sets'] as List)[setIndex]
+              as Map<String, dynamic>;
+      final current = (setItem['weight'] as num).toDouble();
       setItem['weight'] = (current + delta).clamp(0.0, 500.0);
     });
   }
 
   void _updateSetReps(int exIndex, int setIndex, int delta) {
     setState(() {
-      final setItem = _exercises[exIndex]['sets'][setIndex];
-      final current = (setItem['reps'] as int);
+      final setItem =
+          (_exercises[exIndex]['sets'] as List)[setIndex]
+              as Map<String, dynamic>;
+      final current = (setItem['reps'] as num).toInt();
       setItem['reps'] = (current + delta).clamp(1, 100);
     });
   }
@@ -505,7 +520,7 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                         child: Row(
                           children: const [
                             SizedBox(
-                              width: 40,
+                              width: 32,
                               child: Text(
                                 'SET',
                                 style: TextStyle(
@@ -517,8 +532,9 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                               ),
                             ),
                             Expanded(
+                              flex: 3,
                               child: Text(
-                                'WEIGHT (KG)',
+                                'WEIGHT',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 11,
@@ -528,7 +544,9 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                                 ),
                               ),
                             ),
+                            SizedBox(width: 6),
                             Expanded(
+                              flex: 2,
                               child: Text(
                                 'REPS',
                                 textAlign: TextAlign.center,
@@ -540,18 +558,10 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                                 ),
                               ),
                             ),
+                            SizedBox(width: 6),
                             SizedBox(
-                              width: 50,
-                              child: Text(
-                                'STATUS',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 1.0,
-                                  color: GymTheme.textMuted,
-                                ),
-                              ),
+                              width: 40,
+                              child: Text('', textAlign: TextAlign.center),
                             ),
                           ],
                         ),
@@ -566,7 +576,7 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
 
                         return Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
+                            horizontal: 10,
                             vertical: 8,
                           ),
                           margin: const EdgeInsets.symmetric(
@@ -583,7 +593,7 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                             children: [
                               // Set Number
                               SizedBox(
-                                width: 36,
+                                width: 32,
                                 child: Container(
                                   height: 28,
                                   width: 28,
@@ -609,6 +619,7 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
 
                               // Weight Control (- 60 kg +)
                               Expanded(
+                                flex: 3,
                                 child: Container(
                                   height: 40,
                                   decoration: BoxDecoration(
@@ -617,59 +628,47 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                                     border: Border.all(color: GymTheme.border),
                                   ),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      IconButton(
-                                        icon: const Icon(
-                                          Icons.remove,
-                                          size: 14,
-                                          color: GymTheme.textPrimary,
-                                        ),
-                                        onPressed: () => _updateSetWeight(
+                                      _StepperButton(
+                                        icon: Icons.remove,
+                                        onTap: () => _updateSetWeight(
                                           exIndex,
                                           setIndex,
                                           -2.5,
                                         ),
-                                        padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(
-                                          minWidth: 32,
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          weight % 1 == 0
+                                              ? '${weight.toInt()} kg'
+                                              : '$weight kg',
+                                          textAlign: TextAlign.center,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 12,
+                                            color: GymTheme.textPrimary,
+                                          ),
                                         ),
                                       ),
-                                      Text(
-                                        weight % 1 == 0
-                                            ? '${weight.toInt()} kg'
-                                            : '$weight kg',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 13,
-                                          color: GymTheme.textPrimary,
-                                        ),
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(
-                                          Icons.add,
-                                          size: 14,
-                                          color: GymTheme.textPrimary,
-                                        ),
-                                        onPressed: () => _updateSetWeight(
+                                      _StepperButton(
+                                        icon: Icons.add,
+                                        onTap: () => _updateSetWeight(
                                           exIndex,
                                           setIndex,
                                           2.5,
-                                        ),
-                                        padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(
-                                          minWidth: 32,
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 6),
 
                               // Reps Control (- 10 +)
                               Expanded(
+                                flex: 2,
                                 child: Container(
                                   height: 40,
                                   decoration: BoxDecoration(
@@ -678,54 +677,41 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                                     border: Border.all(color: GymTheme.border),
                                   ),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      IconButton(
-                                        icon: const Icon(
-                                          Icons.remove,
-                                          size: 14,
-                                          color: GymTheme.textPrimary,
-                                        ),
-                                        onPressed: () => _updateSetReps(
+                                      _StepperButton(
+                                        icon: Icons.remove,
+                                        onTap: () => _updateSetReps(
                                           exIndex,
                                           setIndex,
                                           -1,
                                         ),
-                                        padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(
-                                          minWidth: 32,
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          '$reps',
+                                          textAlign: TextAlign.center,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 13,
+                                            color: GymTheme.textPrimary,
+                                          ),
                                         ),
                                       ),
-                                      Text(
-                                        '$reps',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 14,
-                                          color: GymTheme.textPrimary,
-                                        ),
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(
-                                          Icons.add,
-                                          size: 14,
-                                          color: GymTheme.textPrimary,
-                                        ),
-                                        onPressed: () => _updateSetReps(
+                                      _StepperButton(
+                                        icon: Icons.add,
+                                        onTap: () => _updateSetReps(
                                           exIndex,
                                           setIndex,
                                           1,
-                                        ),
-                                        padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(
-                                          minWidth: 32,
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 6),
 
                               // Complete Check Button
                               GestureDetector(
@@ -734,7 +720,7 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 150),
                                   height: 40,
-                                  width: 44,
+                                  width: 40,
                                   decoration: BoxDecoration(
                                     color: isDone
                                         ? GymTheme.primary
@@ -748,7 +734,7 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                                   ),
                                   child: Icon(
                                     Icons.check,
-                                    size: 20,
+                                    size: 18,
                                     color: isDone
                                         ? Colors.white
                                         : GymTheme.textMuted,
@@ -843,6 +829,26 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _StepperButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _StepperButton({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: 28,
+        height: 40,
+        child: Icon(icon, size: 14, color: GymTheme.textPrimary),
       ),
     );
   }
