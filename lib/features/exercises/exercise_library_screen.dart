@@ -29,117 +29,276 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
     'Abs',
   ];
 
+  static const _muscleOptions = [
+    'Chest',
+    'Back',
+    'Legs',
+    'Shoulders',
+    'Biceps',
+    'Triceps',
+    'Abs',
+    'Cardio',
+  ];
+
+  static const _equipmentOptions = [
+    'Barbell',
+    'Dumbbell',
+    'Machine',
+    'Bodyweight',
+    'Cable',
+  ];
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  InputDecoration _fieldDecoration({
+    required String label,
+    String? hint,
+    String? errorText,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      errorText: errorText,
+      labelStyle: const TextStyle(
+        color: GymTheme.textSecondary,
+        fontWeight: FontWeight.w600,
+      ),
+      hintStyle: TextStyle(
+        color: GymTheme.textMuted.withValues(alpha: 0.7),
+        fontSize: 13,
+      ),
+      filled: true,
+      fillColor: GymTheme.surfaceElevated,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: GymTheme.border),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: GymTheme.primary, width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: GymTheme.danger),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: GymTheme.danger, width: 1.5),
+      ),
+    );
+  }
+
   void _showAddCustomExerciseDialog() {
+    final formKey = GlobalKey<FormState>();
     final nameCtrl = TextEditingController();
-    final groupCtrl = TextEditingController(text: 'Chest');
-    final equipCtrl = TextEditingController(text: 'Barbell');
+    String muscleGroup = _muscleOptions.first;
+    String equipment = _equipmentOptions.first;
+    var isSubmitting = false;
+    String? submitError;
+    final messenger = ScaffoldMessenger.of(context);
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: GymTheme.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-        title: const Text(
-          'Create New Exercise',
-          style: TextStyle(
-            color: GymTheme.textPrimary,
-            fontWeight: FontWeight.w900,
-            fontSize: 20,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameCtrl,
-              style: const TextStyle(color: GymTheme.textPrimary),
-              decoration: InputDecoration(
-                labelText: 'Exercise Name',
-                labelStyle: const TextStyle(color: GymTheme.textSecondary),
-                filled: true,
-                fillColor: GymTheme.surfaceElevated,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: groupCtrl,
-              style: const TextStyle(color: GymTheme.textPrimary),
-              decoration: InputDecoration(
-                labelText: 'Muscle Group (e.g. Chest)',
-                labelStyle: const TextStyle(color: GymTheme.textSecondary),
-                filled: true,
-                fillColor: GymTheme.surfaceElevated,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: equipCtrl,
-              style: const TextStyle(color: GymTheme.textPrimary),
-              decoration: InputDecoration(
-                labelText: 'Equipment (e.g. Dumbbell)',
-                labelStyle: const TextStyle(color: GymTheme.textSecondary),
-                filled: true,
-                fillColor: GymTheme.surfaceElevated,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'CANCEL',
-              style: TextStyle(
-                color: GymTheme.textMuted,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (nameCtrl.text.trim().isNotEmpty) {
-                final api = ref.read(apiClientProvider);
-                await api.createExercise(
-                  name: nameCtrl.text.trim(),
-                  muscleGroup: groupCtrl.text.trim().isEmpty
-                      ? 'General'
-                      : groupCtrl.text.trim(),
-                  equipment: equipCtrl.text.trim().isEmpty
-                      ? 'Barbell'
-                      : equipCtrl.text.trim(),
-                );
-                ref.invalidate(exercisesProvider);
-                if (mounted) Navigator.pop(context);
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            Future<void> submit() async {
+              if (isSubmitting) return;
+              if (!(formKey.currentState?.validate() ?? false)) return;
+
+              setDialogState(() {
+                isSubmitting = true;
+                submitError = null;
+              });
+
+              final api = ref.read(apiClientProvider);
+              final result = await api.createExercise(
+                name: nameCtrl.text.trim(),
+                muscleGroup: muscleGroup,
+                equipment: equipment,
+              );
+
+              if (!mounted) return;
+
+              if (result == null) {
+                setDialogState(() {
+                  isSubmitting = false;
+                  submitError = 'Could not create exercise. Try again.';
+                });
+                return;
               }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: GymTheme.primary,
-              foregroundColor: Colors.white,
+
+              final createdName = nameCtrl.text.trim();
+              ref.invalidate(exercisesProvider);
+              if (dialogContext.mounted) Navigator.pop(dialogContext);
+
+              messenger.showSnackBar(
+                SnackBar(
+                  content: Text('$createdName added to library'),
+                  behavior: SnackBarBehavior.floating,
+                  backgroundColor: GymTheme.primary,
+                ),
+              );
+            }
+
+            return AlertDialog(
+              backgroundColor: GymTheme.surface,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(28),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            ),
-            child: const Text(
-              'CREATE',
-              style: TextStyle(fontWeight: FontWeight.w900),
-            ),
-          ),
-        ],
-      ),
-    );
+              title: const Text(
+                'Create New Exercise',
+                style: TextStyle(
+                  color: GymTheme.textPrimary,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 20,
+                ),
+              ),
+              content: Form(
+                key: formKey,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextFormField(
+                        controller: nameCtrl,
+                        autofocus: true,
+                        textCapitalization: TextCapitalization.words,
+                        textInputAction: TextInputAction.next,
+                        enabled: !isSubmitting,
+                        style: const TextStyle(
+                          color: GymTheme.textPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        decoration: _fieldDecoration(
+                          label: 'Exercise Name',
+                          hint: 'e.g. Incline Bench Press',
+                        ),
+                        validator: (value) {
+                          final name = value?.trim() ?? '';
+                          if (name.isEmpty) return 'Name is required';
+                          if (name.length < 2) {
+                            return 'Enter at least 2 characters';
+                          }
+                          return null;
+                        },
+                        onFieldSubmitted: (_) => submit(),
+                      ),
+                      const SizedBox(height: 14),
+                      DropdownButtonFormField<String>(
+                        initialValue: muscleGroup,
+                        decoration: _fieldDecoration(label: 'Muscle Group'),
+                        dropdownColor: GymTheme.surface,
+                        style: const TextStyle(
+                          color: GymTheme.textPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        items: _muscleOptions
+                            .map(
+                              (g) => DropdownMenuItem(value: g, child: Text(g)),
+                            )
+                            .toList(),
+                        onChanged: isSubmitting
+                            ? null
+                            : (val) {
+                                if (val != null) muscleGroup = val;
+                              },
+                      ),
+                      const SizedBox(height: 14),
+                      DropdownButtonFormField<String>(
+                        initialValue: equipment,
+                        decoration: _fieldDecoration(label: 'Equipment'),
+                        dropdownColor: GymTheme.surface,
+                        style: const TextStyle(
+                          color: GymTheme.textPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        items: _equipmentOptions
+                            .map(
+                              (e) => DropdownMenuItem(value: e, child: Text(e)),
+                            )
+                            .toList(),
+                        onChanged: isSubmitting
+                            ? null
+                            : (val) {
+                                if (val != null) equipment = val;
+                              },
+                      ),
+                      if (submitError != null) ...[
+                        const SizedBox(height: 12),
+                        Text(
+                          submitError!,
+                          style: const TextStyle(
+                            color: GymTheme.danger,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isSubmitting
+                      ? null
+                      : () => Navigator.pop(dialogContext),
+                  child: const Text(
+                    'CANCEL',
+                    style: TextStyle(
+                      color: GymTheme.textMuted,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: isSubmitting ? null : submit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: GymTheme.primary,
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: GymTheme.primary.withValues(
+                      alpha: 0.5,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                  ),
+                  child: isSubmitting
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          'CREATE',
+                          style: TextStyle(fontWeight: FontWeight.w900),
+                        ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    ).whenComplete(nameCtrl.dispose);
   }
 
   @override
