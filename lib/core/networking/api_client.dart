@@ -326,7 +326,10 @@ class ApiClient {
           equipment: equipment,
           instructions: instructions,
         );
-        if (res != null) return res;
+        if (res != null) {
+          await syncManager.addLocalCachedExercise(res);
+          return res;
+        }
       } catch (_) {
         // Connection error
       }
@@ -339,7 +342,7 @@ class ApiClient {
         'instructions': instructions ?? '',
       });
 
-      return {
+      final localExercise = {
         'id': 'ex_offline_${DateTime.now().millisecondsSinceEpoch}',
         'name': name,
         'muscleGroup': muscleGroup,
@@ -348,6 +351,11 @@ class ApiClient {
         'isCustom': true,
         'offlineQueued': true,
       };
+
+      // Immediately cache locally so UI displays it right away
+      await syncManager.addLocalCachedExercise(localExercise);
+
+      return localExercise;
     });
   }
 }

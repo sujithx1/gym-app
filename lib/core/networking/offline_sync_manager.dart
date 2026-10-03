@@ -126,6 +126,15 @@ class OfflineSyncManager {
     }
   }
 
+  Future<void> addLocalCachedExercise(Map<String, dynamic> exercise) async {
+    final list = await getCachedExercises() ?? [];
+    list.removeWhere((e) =>
+        e['id'] == exercise['id'] ||
+        e['name'].toString().toLowerCase() == exercise['name'].toString().toLowerCase());
+    list.insert(0, exercise);
+    await cacheExercises(list);
+  }
+
   // --- Sync DB logic ---
 
   /// Attempts to process all queued mutations against the API backend.
