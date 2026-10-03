@@ -596,7 +596,7 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
                       message: 'Loading exercise library...',
                     ),
                   ),
-                  error: (_, __) => const Center(
+                  error: (_, stack) => const Center(
                     child: Text(
                       'Error loading exercises',
                       style: TextStyle(color: GymTheme.danger),

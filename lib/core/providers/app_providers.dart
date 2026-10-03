@@ -102,6 +102,78 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier(ref.watch(apiClientProvider));
 });
 
+// --- Offline Sync State ---
+
+class SyncState {
+  final bool isSyncing;
+  final int pendingCount;
+  final String? lastMessage;
+  final bool? lastSuccess;
+
+  SyncState({
+    this.isSyncing = false,
+    this.pendingCount = 0,
+    this.lastMessage,
+    this.lastSuccess,
+  });
+
+  SyncState copyWith({
+    bool? isSyncing,
+    int? pendingCount,
+    String? lastMessage,
+    bool? lastSuccess,
+  }) {
+    return SyncState(
+      isSyncing: isSyncing ?? this.isSyncing,
+      pendingCount: pendingCount ?? this.pendingCount,
+      lastMessage: lastMessage ?? this.lastMessage,
+      lastSuccess: lastSuccess ?? this.lastSuccess,
+    );
+  }
+}
+
+class SyncNotifier extends StateNotifier<SyncState> {
+  final ApiClient _apiClient;
+  final Ref _ref;
+
+  SyncNotifier(this._apiClient, this._ref) : super(SyncState()) {
+    refreshPendingCount();
+  }
+
+  Future<void> refreshPendingCount() async {
+    final count = await _apiClient.syncManager.getPendingCount();
+    state = state.copyWith(pendingCount: count);
+  }
+
+  Future<Map<String, dynamic>> performSync() async {
+    state = state.copyWith(isSyncing: true, lastMessage: null);
+
+    final result = await _apiClient.syncManager.syncPendingData(_apiClient);
+
+    final remainingCount = await _apiClient.syncManager.getPendingCount();
+    final bool success = result['success'] == true;
+    final String message = result['message'] ?? 'Sync completed';
+
+    state = state.copyWith(
+      isSyncing: false,
+      pendingCount: remainingCount,
+      lastMessage: message,
+      lastSuccess: success,
+    );
+
+    // Refresh app data providers
+    _ref.invalidate(todayWorkoutProvider);
+    _ref.invalidate(progressOverviewProvider);
+    _ref.invalidate(exercisesProvider);
+
+    return result;
+  }
+}
+
+final syncProvider = StateNotifierProvider<SyncNotifier, SyncState>((ref) {
+  return SyncNotifier(ref.watch(apiClientProvider), ref);
+});
+
 // Today Workout Provider
 final todayWorkoutProvider = FutureProvider.autoDispose<Map<String, dynamic>>((ref) async {
   final api = ref.watch(apiClientProvider);

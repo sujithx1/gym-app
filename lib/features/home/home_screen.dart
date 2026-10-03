@@ -172,7 +172,7 @@ class HomeScreen extends ConsumerWidget {
                       child: TreadmillLoadingIndicator(message: 'Loading workout dashboard...'),
                     ),
                   ),
-                  error: (_, __) => _buildFallbackGrid(context),
+                  error: (_, stack) => _buildFallbackGrid(context),
                 ),
                 const SizedBox(height: 24),
 
@@ -318,7 +318,7 @@ class HomeScreen extends ConsumerWidget {
                     );
                   },
                   loading: () => const SizedBox.shrink(),
-                  error: (_, __) => const SizedBox.shrink(),
+                  error: (_, stack) => const SizedBox.shrink(),
                 ),
                 const SizedBox(height: 28),
 
@@ -364,7 +364,7 @@ class HomeScreen extends ConsumerWidget {
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemCount: prs.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 14),
+                        separatorBuilder: (_, index) => const SizedBox(width: 14),
                         itemBuilder: (context, index) {
                           final pr = prs[index];
                           final colors = [
@@ -442,7 +442,7 @@ class HomeScreen extends ConsumerWidget {
                     );
                   },
                   loading: () => const SizedBox.shrink(),
-                  error: (_, __) => const SizedBox.shrink(),
+                  error: (_, stack) => const SizedBox.shrink(),
                 ),
               ],
             ),

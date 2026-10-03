@@ -177,7 +177,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                     );
                   },
                   loading: () => Container(height: 140, decoration: BoxDecoration(color: GymTheme.periwinkle, borderRadius: BorderRadius.circular(28))),
-                  error: (_, __) => const SizedBox.shrink(),
+                  error: (_, stack) => const SizedBox.shrink(),
                 ),
                 const SizedBox(height: 28),
 

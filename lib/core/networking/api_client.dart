@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/app_config.dart';
+import 'offline_sync_manager.dart';
 
 class ApiClient {
   static const String baseUrl = AppConfig.apiBaseUrl;
   String? _token;
   final void Function()? onRequestStart;
   final void Function()? onRequestEnd;
+  final OfflineSyncManager syncManager = OfflineSyncManager();
 
   ApiClient({this.onRequestStart, this.onRequestEnd});
 
@@ -77,36 +79,116 @@ class ApiClient {
         final res = await http.get(
           Uri.parse('$baseUrl/workouts/today'),
           headers: _headers,
-        ).timeout(const Duration(seconds: 5));
-
-        if (res.statusCode == 200) {
-          return jsonDecode(res.body);
-        }
-      } catch (e) {
-        // Return empty today state on network error
-      }
-      return {'today': null};
-    });
-  }
-
-  // --- Session APIs ---
-  Future<String?> startSession(String? workoutDayId, String name) async {
-    return _trackRequest(() async {
-      try {
-        final res = await http.post(
-          Uri.parse('$baseUrl/sessions/start'),
-          headers: _headers,
-          body: jsonEncode({'workoutDayId': workoutDayId, 'name': name}),
-        ).timeout(const Duration(seconds: 5));
+        ).timeout(const Duration(seconds: 4));
 
         if (res.statusCode == 200) {
           final data = jsonDecode(res.body);
-          return data['sessionId'];
+          await syncManager.cacheTodayWorkout(data);
+          return data;
         }
-      } catch (e) {
-        // Connection issue
+      } catch (_) {
+        // Fallback to offline cache
       }
-      return 'sess_${DateTime.now().millisecondsSinceEpoch}';
+
+      final cached = await syncManager.getCachedTodayWorkout();
+      return cached ?? {'today': null};
+    });
+  }
+
+  // --- Session Direct API Helpers ---
+  Future<String?> directStartSession(String? workoutDayId, String name) async {
+    final res = await http.post(
+      Uri.parse('$baseUrl/sessions/start'),
+      headers: _headers,
+      body: jsonEncode({'workoutDayId': workoutDayId, 'name': name}),
+    ).timeout(const Duration(seconds: 4));
+
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      return data['sessionId'] as String?;
+    }
+    return null;
+  }
+
+  Future<bool> directLogSet({
+    required String sessionId,
+    required String exerciseId,
+    required int setNumber,
+    required double weight,
+    required int reps,
+    required bool completed,
+  }) async {
+    final res = await http.put(
+      Uri.parse('$baseUrl/sessions/$sessionId/set'),
+      headers: _headers,
+      body: jsonEncode({
+        'exerciseId': exerciseId,
+        'setNumber': setNumber,
+        'weight': weight,
+        'reps': reps,
+        'completed': completed,
+      }),
+    ).timeout(const Duration(seconds: 4));
+
+    return res.statusCode == 200;
+  }
+
+  Future<Map<String, dynamic>?> directCompleteSession(String sessionId) async {
+    final res = await http.post(
+      Uri.parse('$baseUrl/sessions/$sessionId/complete'),
+      headers: _headers,
+      body: jsonEncode({'notes': 'Workout completed!'}),
+    ).timeout(const Duration(seconds: 4));
+
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      return data['summary'] as Map<String, dynamic>? ?? {};
+    }
+    return null;
+  }
+
+  Future<Map<String, dynamic>?> directCreateExercise({
+    required String name,
+    required String muscleGroup,
+    required String equipment,
+    String? instructions,
+  }) async {
+    final res = await http.post(
+      Uri.parse('$baseUrl/exercises'),
+      headers: _headers,
+      body: jsonEncode({
+        'name': name,
+        'muscleGroup': muscleGroup,
+        'equipment': equipment,
+        'instructions': instructions ?? '',
+      }),
+    ).timeout(const Duration(seconds: 4));
+
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      return jsonDecode(res.body);
+    }
+    return null;
+  }
+
+  // --- Session Public APIs with Offline Queue Fallback ---
+  Future<String?> startSession(String? workoutDayId, String name) async {
+    return _trackRequest(() async {
+      try {
+        final sessionId = await directStartSession(workoutDayId, name);
+        if (sessionId != null) return sessionId;
+      } catch (_) {
+        // Backend offline
+      }
+
+      // Offline mode: Queue mutation & generate local ID
+      final localSessionId = 'sess_offline_${DateTime.now().millisecondsSinceEpoch}';
+      await syncManager.queueMutation('start_session', {
+        'workoutDayId': workoutDayId,
+        'name': name,
+        'localSessionId': localSessionId,
+      });
+
+      return localSessionId;
     });
   }
 
@@ -120,52 +202,57 @@ class ApiClient {
   }) async {
     return _trackRequest(() async {
       try {
-        final res = await http.put(
-          Uri.parse('$baseUrl/sessions/$sessionId/set'),
-          headers: _headers,
-          body: jsonEncode({
-            'exerciseId': exerciseId,
-            'setNumber': setNumber,
-            'weight': weight,
-            'reps': reps,
-            'completed': completed,
-          }),
-        ).timeout(const Duration(seconds: 4));
-
-        return res.statusCode == 200;
-      } catch (e) {
-        return false;
+        final ok = await directLogSet(
+          sessionId: sessionId,
+          exerciseId: exerciseId,
+          setNumber: setNumber,
+          weight: weight,
+          reps: reps,
+          completed: completed,
+        );
+        if (ok) return true;
+      } catch (_) {
+        // Backend offline
       }
+
+      // Offline mode: queue locally
+      await syncManager.queueMutation('log_set', {
+        'sessionId': sessionId,
+        'exerciseId': exerciseId,
+        'setNumber': setNumber,
+        'weight': weight,
+        'reps': reps,
+        'completed': completed,
+      });
+
+      return true; // return optimistic true locally
     });
   }
 
   Future<Map<String, dynamic>> completeSession(String sessionId) async {
     return _trackRequest(() async {
       try {
-        final res = await http.post(
-          Uri.parse('$baseUrl/sessions/$sessionId/complete'),
-          headers: _headers,
-          body: jsonEncode({'notes': 'Workout completed!'}),
-        ).timeout(const Duration(seconds: 5));
-
-        if (res.statusCode == 200) {
-          final data = jsonDecode(res.body);
-          return data['summary'] ?? {};
-        }
+        final summary = await directCompleteSession(sessionId);
+        if (summary != null) return summary;
       } catch (_) {
-        // Return default summary on network failure
+        // Backend offline
       }
+
+      // Queue locally
+      await syncManager.queueMutation('complete_session', {
+        'sessionId': sessionId,
+      });
 
       return {
         'sessionId': sessionId,
-        'name': 'Workout Session',
+        'name': 'Workout Session (Offline Queued)',
         'totalVolumeKg': 0.0,
         'durationMinutes': 0,
         'totalSetsCompleted': 0,
         'previousVolumeKg': 0.0,
         'volumeDeltaKg': 0.0,
         'percentageDelta': 0,
-        'message': 'Workout completed successfully!',
+        'message': 'Workout completed offline! Stored in local storage for DB sync.',
       };
     });
   }
@@ -177,16 +264,19 @@ class ApiClient {
         final res = await http.get(
           Uri.parse('$baseUrl/progress/overview'),
           headers: _headers,
-        ).timeout(const Duration(seconds: 5));
+        ).timeout(const Duration(seconds: 4));
 
         if (res.statusCode == 200) {
-          return jsonDecode(res.body);
+          final data = jsonDecode(res.body);
+          await syncManager.cacheProgressOverview(data);
+          return data;
         }
       } catch (_) {
-        // Return default overview on network failure
+        // Fallback
       }
 
-      return {
+      final cached = await syncManager.getCachedProgressOverview();
+      return cached ?? {
         'summary': {
           'totalWorkouts': 0,
           'totalVolumeKg': 0.0,
@@ -206,16 +296,19 @@ class ApiClient {
             ? Uri.parse('$baseUrl/exercises?muscleGroup=$muscleGroup')
             : Uri.parse('$baseUrl/exercises');
 
-        final res = await http.get(uri, headers: _headers).timeout(const Duration(seconds: 5));
+        final res = await http.get(uri, headers: _headers).timeout(const Duration(seconds: 4));
         if (res.statusCode == 200) {
           final data = jsonDecode(res.body);
-          return data['exercises'] ?? [];
+          final exercises = data['exercises'] as List<dynamic>? ?? [];
+          await syncManager.cacheExercises(exercises);
+          return exercises;
         }
       } catch (_) {
-        // Return empty exercise list on network failure
+        // Fallback
       }
 
-      return [];
+      final cached = await syncManager.getCachedExercises();
+      return cached ?? [];
     });
   }
 
@@ -227,25 +320,34 @@ class ApiClient {
   }) async {
     return _trackRequest(() async {
       try {
-        final res = await http.post(
-          Uri.parse('$baseUrl/exercises'),
-          headers: _headers,
-          body: jsonEncode({
-            'name': name,
-            'muscleGroup': muscleGroup,
-            'equipment': equipment,
-            'instructions': instructions ?? '',
-          }),
-        ).timeout(const Duration(seconds: 5));
-
-        if (res.statusCode == 200 || res.statusCode == 201) {
-          return jsonDecode(res.body);
-        }
+        final res = await directCreateExercise(
+          name: name,
+          muscleGroup: muscleGroup,
+          equipment: equipment,
+          instructions: instructions,
+        );
+        if (res != null) return res;
       } catch (_) {
         // Connection error
       }
-      return null;
+
+      // Offline queueing
+      await syncManager.queueMutation('create_exercise', {
+        'name': name,
+        'muscleGroup': muscleGroup,
+        'equipment': equipment,
+        'instructions': instructions ?? '',
+      });
+
+      return {
+        'id': 'ex_offline_${DateTime.now().millisecondsSinceEpoch}',
+        'name': name,
+        'muscleGroup': muscleGroup,
+        'equipment': equipment,
+        'instructions': instructions ?? '',
+        'isCustom': true,
+        'offlineQueued': true,
+      };
     });
   }
 }
-

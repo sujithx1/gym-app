@@ -20,6 +20,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
     final progressAsync = ref.watch(progressOverviewProvider);
+    final syncState = ref.watch(syncProvider);
 
     return Scaffold(
       backgroundColor: GymTheme.background,
@@ -86,7 +87,143 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   );
                 },
                 loading: () => Container(height: 80, decoration: BoxDecoration(color: GymTheme.surface, borderRadius: BorderRadius.circular(28))),
-                error: (_, __) => const SizedBox.shrink(),
+                error: (_, stack) => const SizedBox.shrink(),
+              ),
+              const SizedBox(height: 28),
+
+              // --- DATABASE SYNC SECTION ---
+              const Text(
+                'DATABASE & STORAGE',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.2,
+                  color: GymTheme.textMuted,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: GymTheme.surface,
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(
+                    color: syncState.pendingCount > 0
+                        ? GymTheme.warning.withValues(alpha: 0.5)
+                        : GymTheme.border,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: syncState.pendingCount > 0
+                                ? GymTheme.warning.withValues(alpha: 0.15)
+                                : GymTheme.primary.withValues(alpha: 0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            syncState.pendingCount > 0
+                                ? Icons.cloud_upload_outlined
+                                : Icons.cloud_done_rounded,
+                            color: syncState.pendingCount > 0
+                                ? GymTheme.warning
+                                : GymTheme.primary,
+                            size: 22,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Local Data Sync',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 16,
+                                  color: GymTheme.textPrimary,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                syncState.pendingCount > 0
+                                    ? '${syncState.pendingCount} offline changes waiting to sync'
+                                    : 'All offline data is synced with backend server',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: syncState.pendingCount > 0
+                                      ? GymTheme.warning
+                                      : GymTheme.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        onPressed: syncState.isSyncing
+                            ? null
+                            : () async {
+                                final res = await ref.read(syncProvider.notifier).performSync();
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        res['message'] ?? 'Sync operation completed.',
+                                        style: const TextStyle(fontWeight: FontWeight.w700),
+                                      ),
+                                      backgroundColor: res['success'] == true
+                                          ? GymTheme.primary
+                                          : GymTheme.warning,
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: GymTheme.primary,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        icon: syncState.isSyncing
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              )
+                            : const Icon(Icons.sync, size: 20),
+                        label: Text(
+                          syncState.isSyncing ? 'SYNCING...' : 'SYNC DB NOW',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 13,
+                            letterSpacing: 1.1,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 28),
 
@@ -220,5 +357,3 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 }
-
-

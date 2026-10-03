@@ -403,7 +403,7 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                               style: TextStyle(
                                 fontSize: 32,
                                 fontWeight: FontWeight.w900,
-                                color: GymTheme.textPrimary.withOpacity(0.3),
+                                color: GymTheme.textPrimary.withValues(alpha: 0.3),
                                 height: 1.0,
                               ),
                             ),
@@ -585,7 +585,7 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                           ),
                           decoration: BoxDecoration(
                             color: isDone
-                                ? cardAccent.withOpacity(0.35)
+                                ? cardAccent.withValues(alpha: 0.35)
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(16),
                           ),
