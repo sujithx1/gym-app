@@ -139,8 +139,8 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
               }
 
               final createdName = nameCtrl.text.trim();
-              ref.invalidate(exercisesProvider);
               if (dialogContext.mounted) Navigator.pop(dialogContext);
+              ref.invalidate(exercisesProvider);
 
               messenger.showSnackBar(
                 SnackBar(
