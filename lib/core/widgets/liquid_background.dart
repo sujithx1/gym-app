@@ -42,6 +42,8 @@ class _LiquidBackgroundState extends State<LiquidBackground>
   Widget build(BuildContext context) {
     if (!widget.enableBlobs) return widget.child;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Stack(
       children: [
         // Background Base
@@ -53,7 +55,7 @@ class _LiquidBackgroundState extends State<LiquidBackground>
             animation: _controller,
             builder: (context, _) {
               return CustomPaint(
-                painter: _LiquidBlobPainter(_controller.value),
+                painter: _LiquidBlobPainter(_controller.value, isDark: isDark),
               );
             },
           ),
@@ -68,16 +70,19 @@ class _LiquidBackgroundState extends State<LiquidBackground>
 
 class _LiquidBlobPainter extends CustomPainter {
   final double animationValue;
+  final bool isDark;
 
-  _LiquidBlobPainter(this.animationValue);
+  _LiquidBlobPainter(this.animationValue, {this.isDark = false});
 
   @override
   void paint(Canvas canvas, Size size) {
     final double t = animationValue * 2 * math.pi;
 
-    // Top-Left Soft Liquid Blob (Mint)
+    // Blob 1 (Top Left)
     final paint1 = Paint()
-      ..color = GymTheme.mint.withValues(alpha: 0.45)
+      ..color = isDark
+          ? const Color(0xFF5B50A1).withValues(alpha: 0.22)
+          : GymTheme.mint.withValues(alpha: 0.45)
       ..style = PaintingStyle.fill
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 50);
 
@@ -87,9 +92,11 @@ class _LiquidBlobPainter extends CustomPainter {
     );
     canvas.drawCircle(center1, size.width * 0.45, paint1);
 
-    // Top-Right Soft Liquid Blob (Lavender)
+    // Blob 2 (Top Right)
     final paint2 = Paint()
-      ..color = GymTheme.lavender.withValues(alpha: 0.40)
+      ..color = isDark
+          ? const Color(0xFF4A4474).withValues(alpha: 0.20)
+          : GymTheme.lavender.withValues(alpha: 0.40)
       ..style = PaintingStyle.fill
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 60);
 
@@ -99,9 +106,11 @@ class _LiquidBlobPainter extends CustomPainter {
     );
     canvas.drawCircle(center2, size.width * 0.40, paint2);
 
-    // Mid-Right Soft Liquid Blob (Peach)
+    // Blob 3 (Mid Right)
     final paint3 = Paint()
-      ..color = GymTheme.peach.withValues(alpha: 0.35)
+      ..color = isDark
+          ? const Color(0xFF335B62).withValues(alpha: 0.18)
+          : GymTheme.peach.withValues(alpha: 0.35)
       ..style = PaintingStyle.fill
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 55);
 
@@ -111,9 +120,11 @@ class _LiquidBlobPainter extends CustomPainter {
     );
     canvas.drawCircle(center3, size.width * 0.35, paint3);
 
-    // Bottom-Left Soft Liquid Blob (Blue)
+    // Blob 4 (Bottom Left)
     final paint4 = Paint()
-      ..color = GymTheme.blue.withValues(alpha: 0.35)
+      ..color = isDark
+          ? const Color(0xFF3B4380).withValues(alpha: 0.20)
+          : GymTheme.blue.withValues(alpha: 0.35)
       ..style = PaintingStyle.fill
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 50);
 

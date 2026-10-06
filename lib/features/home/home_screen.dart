@@ -189,9 +189,9 @@ class HomeScreen extends ConsumerWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: GymTheme.surface,
+                        color: GymTheme.getSurfaceColor(context),
                         borderRadius: BorderRadius.circular(28),
-                        border: Border.all(color: GymTheme.border),
+                        border: Border.all(color: GymTheme.getBorderColor(context)),
                         boxShadow: [
                           BoxShadow(
                             color: GymTheme.periwinkle.withValues(alpha: 0.15),
@@ -220,8 +220,8 @@ class HomeScreen extends ConsumerWidget {
                                   Container(
                                     width: 8,
                                     height: 8,
-                                    decoration: const BoxDecoration(
-                                      color: GymTheme.primary,
+                                    decoration: BoxDecoration(
+                                      color: GymTheme.getPrimaryColor(context),
                                       shape: BoxShape.circle,
                                     ),
                                   ),
@@ -230,7 +230,7 @@ class HomeScreen extends ConsumerWidget {
                                     width: 8,
                                     height: 8,
                                     decoration: BoxDecoration(
-                                      color: GymTheme.primary.withValues(alpha: 0.25),
+                                      color: GymTheme.getPrimaryColor(context).withValues(alpha: 0.25),
                                       shape: BoxShape.circle,
                                     ),
                                   ),
@@ -247,10 +247,10 @@ class HomeScreen extends ConsumerWidget {
                             children: [
                               Text(
                                 '$percentInt%',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 48,
                                   fontWeight: FontWeight.w900,
-                                  color: GymTheme.textPrimary,
+                                  color: GymTheme.getTextPrimaryColor(context),
                                   letterSpacing: -1.5,
                                   height: 1.0,
                                 ),
@@ -262,7 +262,7 @@ class HomeScreen extends ConsumerWidget {
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
-                                    color: GymTheme.textSecondary.withValues(alpha: 0.8),
+                                    color: GymTheme.getTextSecondaryColor(context).withValues(alpha: 0.8),
                                     height: 1.35,
                                   ),
                                 ),
@@ -277,8 +277,8 @@ class HomeScreen extends ConsumerWidget {
                             child: LinearProgressIndicator(
                               value: progressRatio,
                               minHeight: 12,
-                              backgroundColor: GymTheme.surfaceElevated,
-                              valueColor: const AlwaysStoppedAnimation<Color>(GymTheme.primary),
+                              backgroundColor: GymTheme.getSurfaceElevatedColor(context),
+                              valueColor: AlwaysStoppedAnimation<Color>(GymTheme.getPrimaryColor(context)),
                             ),
                           ),
                           const SizedBox(height: 20),
@@ -287,12 +287,12 @@ class HomeScreen extends ConsumerWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
+                              Text(
                                 'Daily Streak Status',
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
-                                  color: GymTheme.textSecondary,
+                                  color: GymTheme.getTextSecondaryColor(context),
                                 ),
                               ),
                               Container(

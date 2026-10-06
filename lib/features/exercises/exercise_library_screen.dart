@@ -306,7 +306,7 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
     final exercisesAsync = ref.watch(exercisesProvider);
 
     return Scaffold(
-      backgroundColor: GymTheme.background,
+      backgroundColor: GymTheme.getBackgroundColor(context),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -319,8 +319,8 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
+                    children: [
+                      const Text(
                         'PRACTICES & MOVEMENTS',
                         style: TextStyle(
                           fontSize: 11,
@@ -329,13 +329,13 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
                           color: GymTheme.textMuted,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         'Exercise Library',
                         style: TextStyle(
                           fontSize: 26,
                           fontWeight: FontWeight.w900,
-                          color: GymTheme.textPrimary,
+                          color: GymTheme.getTextPrimaryColor(context),
                           letterSpacing: -0.5,
                         ),
                       ),
@@ -373,9 +373,9 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
               child: Container(
                 decoration: BoxDecoration(
-                  color: GymTheme.surface,
+                  color: GymTheme.getSurfaceColor(context),
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: GymTheme.border),
+                  border: Border.all(color: GymTheme.getBorderColor(context)),
                 ),
                 child: TextField(
                   controller: _searchCtrl,
@@ -384,20 +384,20 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
                       _searchQuery = val.toLowerCase();
                     });
                   },
-                  style: const TextStyle(
-                    color: GymTheme.textPrimary,
+                  style: TextStyle(
+                    color: GymTheme.getTextPrimaryColor(context),
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                   decoration: InputDecoration(
                     hintText: 'Search movements or muscle group...',
                     hintStyle: TextStyle(
-                      color: GymTheme.textSecondary.withValues(alpha: 0.6),
+                      color: GymTheme.getTextSecondaryColor(context).withValues(alpha: 0.6),
                       fontSize: 14,
                     ),
                     prefixIcon: Icon(
                       Icons.search_rounded,
-                      color: GymTheme.textSecondary.withValues(alpha: 0.7),
+                      color: GymTheme.getTextSecondaryColor(context).withValues(alpha: 0.7),
                     ),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
@@ -526,9 +526,9 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
                         return Container(
                           margin: const EdgeInsets.only(bottom: 12),
                           decoration: BoxDecoration(
-                            color: GymTheme.surface,
+                            color: GymTheme.getSurfaceColor(context),
                             borderRadius: BorderRadius.circular(24),
-                            border: Border.all(color: GymTheme.border),
+                            border: Border.all(color: GymTheme.getBorderColor(context)),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.02),
@@ -557,10 +557,10 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
                             ),
                             title: Text(
                               ex['name'] ?? '',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 fontSize: 16,
-                                color: GymTheme.textPrimary,
+                                color: GymTheme.getTextPrimaryColor(context),
                               ),
                             ),
                             subtitle: Text(
@@ -568,7 +568,7 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: GymTheme.textSecondary.withValues(
+                                color: GymTheme.getTextSecondaryColor(context).withValues(
                                   alpha: 0.8,
                                 ),
                               ),
@@ -577,13 +577,13 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
                               width: 32,
                               height: 32,
                               decoration: BoxDecoration(
-                                color: GymTheme.surfaceElevated,
+                                color: GymTheme.getSurfaceElevatedColor(context),
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.north_east_rounded,
                                 size: 16,
-                                color: GymTheme.primary,
+                                color: GymTheme.getTextPrimaryColor(context),
                               ),
                             ),
                           ),

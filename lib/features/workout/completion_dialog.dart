@@ -57,38 +57,38 @@ class CompletionDialog extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(22),
             decoration: BoxDecoration(
-              color: GymTheme.surface,
+              color: GymTheme.getSurfaceColor(context),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: GymTheme.border),
+              border: Border.all(color: GymTheme.getBorderColor(context)),
             ),
             child: Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildStatCol('$totalSetsCompleted', 'sets'),
-                    Container(height: 32, width: 1, color: GymTheme.border),
-                    _buildStatCol('${totalVolumeKg.toInt()} kg', 'volume'),
-                    Container(height: 32, width: 1, color: GymTheme.border),
-                    _buildStatCol('$durationMinutes min', 'duration'),
+                    _buildStatCol(context, '$totalSetsCompleted', 'sets'),
+                    Container(height: 32, width: 1, color: GymTheme.getBorderColor(context)),
+                    _buildStatCol(context, '${totalVolumeKg.toInt()} kg', 'volume'),
+                    Container(height: 32, width: 1, color: GymTheme.getBorderColor(context)),
+                    _buildStatCol(context, '$durationMinutes min', 'duration'),
                   ],
                 ),
                 const SizedBox(height: 18),
-                const Divider(color: GymTheme.border, height: 1),
+                Divider(color: GymTheme.getBorderColor(context), height: 1),
                 const SizedBox(height: 16),
 
                 // Volume Delta Badge
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.north_east_rounded, color: GymTheme.textPrimary, size: 18),
+                    Icon(Icons.north_east_rounded, color: GymTheme.getTextPrimaryColor(context), size: 18),
                     const SizedBox(width: 6),
                     Text(
                       '↑ ${volumeDeltaKg.toInt()} kg vs previous workout',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w800,
                         fontSize: 14,
-                        color: GymTheme.textPrimary,
+                        color: GymTheme.getTextPrimaryColor(context),
                       ),
                     ),
                   ],
@@ -116,17 +116,17 @@ class CompletionDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCol(String val, String label) {
+  Widget _buildStatCol(BuildContext context, String val, String label) {
     return Column(
       children: [
         Text(
           val,
-          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: GymTheme.textPrimary),
+          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: GymTheme.getTextPrimaryColor(context)),
         ),
         const SizedBox(height: 2),
         Text(
           label,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: GymTheme.textSecondary),
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: GymTheme.getTextSecondaryColor(context)),
         ),
       ],
     );

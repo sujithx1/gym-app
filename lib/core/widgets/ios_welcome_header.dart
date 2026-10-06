@@ -108,19 +108,19 @@ class _IosWelcomeHeaderState extends State<IosWelcomeHeader>
                       Container(
                         width: 6,
                         height: 6,
-                        decoration: const BoxDecoration(
-                          color: GymTheme.primary,
+                        decoration: BoxDecoration(
+                          color: GymTheme.getPrimaryColor(context),
                           shape: BoxShape.circle,
                         ),
                       ),
                       const SizedBox(width: 6),
                       Text(
                         '$_greetingTime • DAILY OVERVIEW',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.2,
-                          color: GymTheme.textMuted,
+                          color: GymTheme.getTextSecondaryColor(context),
                         ),
                       ),
                     ],
@@ -133,10 +133,10 @@ class _IosWelcomeHeaderState extends State<IosWelcomeHeader>
                           'Hello, $displayName',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 27,
                             fontWeight: FontWeight.w900,
-                            color: GymTheme.textPrimary,
+                            color: GymTheme.getTextPrimaryColor(context),
                             letterSpacing: -0.7,
                             height: 1.1,
                           ),
@@ -172,10 +172,10 @@ class _IosWelcomeHeaderState extends State<IosWelcomeHeader>
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: GymTheme.surface,
+                  color: GymTheme.getSurfaceColor(context),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: GymTheme.getBorderColor(context),
                     width: 1.6,
                   ),
                   boxShadow: [
@@ -194,10 +194,10 @@ class _IosWelcomeHeaderState extends State<IosWelcomeHeader>
                 alignment: Alignment.center,
                 child: Text(
                   initial,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w900,
                     fontSize: 20,
-                    color: GymTheme.textPrimary,
+                    color: GymTheme.getTextPrimaryColor(context),
                   ),
                 ),
               ),

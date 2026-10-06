@@ -370,9 +370,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           dropdownColor: GymTheme.getSurfaceColor(context),
                           style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: GymTheme.getTextPrimaryColor(context)),
                           items: const [
-                            DropdownMenuItem(value: ThemeMode.light, child: Text('Light ☀️')),
-                            DropdownMenuItem(value: ThemeMode.dark, child: Text('Dark 🌙')),
-                            DropdownMenuItem(value: ThemeMode.system, child: Text('System 📱')),
+                            DropdownMenuItem(value: ThemeMode.light, child: Text('Light')),
+                            DropdownMenuItem(value: ThemeMode.dark, child: Text('Dark')),
+                            DropdownMenuItem(value: ThemeMode.system, child: Text('System')),
                           ],
                           onChanged: (mode) {
                             if (mode != null) {

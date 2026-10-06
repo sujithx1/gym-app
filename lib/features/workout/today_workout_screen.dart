@@ -244,25 +244,25 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
         : 0.0;
 
     return Scaffold(
-      backgroundColor: GymTheme.background,
+      backgroundColor: GymTheme.getBackgroundColor(context),
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               title.toUpperCase(),
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w900,
                 fontSize: 18,
-                color: GymTheme.textPrimary,
+                color: GymTheme.getTextPrimaryColor(context),
               ),
             ),
             Text(
               '${_exercises.length} exercises  •  $_totalSetsCount sets  •  ~55 min',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: GymTheme.textSecondary,
+                color: GymTheme.getTextSecondaryColor(context),
               ),
             ),
           ],
@@ -378,9 +378,9 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                 return Container(
                   margin: const EdgeInsets.only(bottom: 24),
                   decoration: BoxDecoration(
-                    color: GymTheme.surface,
+                    color: GymTheme.getSurfaceColor(context),
                     borderRadius: BorderRadius.circular(28),
-                    border: Border.all(color: GymTheme.border),
+                    border: Border.all(color: GymTheme.getBorderColor(context)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -458,17 +458,17 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                             vertical: 10,
                           ),
                           decoration: BoxDecoration(
-                            color: GymTheme.background,
+                            color: GymTheme.getBackgroundColor(context),
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: GymTheme.border),
+                            border: Border.all(color: GymTheme.getBorderColor(context)),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
-                                  Text(
+                                children: [
+                                  const Text(
                                     'LAST SESSION',
                                     style: TextStyle(
                                       fontSize: 10,
@@ -477,13 +477,13 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                                       color: GymTheme.textMuted,
                                     ),
                                   ),
-                                  SizedBox(height: 2),
+                                  const SizedBox(height: 2),
                                   Text(
                                     '60 kg × 10',
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
-                                      color: GymTheme.textPrimary,
+                                      color: GymTheme.getTextPrimaryColor(context),
                                     ),
                                   ),
                                 ],
@@ -601,7 +601,7 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                                   decoration: BoxDecoration(
                                     color: isDone
                                         ? GymTheme.primary
-                                        : GymTheme.background,
+                                        : GymTheme.getBackgroundColor(context),
                                     shape: BoxShape.circle,
                                   ),
                                   child: Text(
@@ -611,7 +611,7 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                                       fontSize: 12,
                                       color: isDone
                                           ? Colors.white
-                                          : GymTheme.textPrimary,
+                                          : GymTheme.getTextPrimaryColor(context),
                                     ),
                                   ),
                                 ),
@@ -623,9 +623,9 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                                 child: Container(
                                   height: 40,
                                   decoration: BoxDecoration(
-                                    color: GymTheme.surface,
+                                    color: GymTheme.getSurfaceColor(context),
                                     borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(color: GymTheme.border),
+                                    border: Border.all(color: GymTheme.getBorderColor(context)),
                                   ),
                                   child: Row(
                                     children: [
@@ -645,10 +645,10 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                                           textAlign: TextAlign.center,
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontWeight: FontWeight.w800,
                                             fontSize: 12,
-                                            color: GymTheme.textPrimary,
+                                            color: GymTheme.getTextPrimaryColor(context),
                                           ),
                                         ),
                                       ),
@@ -672,9 +672,9 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                                 child: Container(
                                   height: 40,
                                   decoration: BoxDecoration(
-                                    color: GymTheme.surface,
+                                    color: GymTheme.getSurfaceColor(context),
                                     borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(color: GymTheme.border),
+                                    border: Border.all(color: GymTheme.getBorderColor(context)),
                                   ),
                                   child: Row(
                                     children: [
@@ -692,10 +692,10 @@ class _TodayWorkoutScreenState extends ConsumerState<TodayWorkoutScreen> {
                                           textAlign: TextAlign.center,
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontWeight: FontWeight.w800,
                                             fontSize: 13,
-                                            color: GymTheme.textPrimary,
+                                            color: GymTheme.getTextPrimaryColor(context),
                                           ),
                                         ),
                                       ),
@@ -848,7 +848,7 @@ class _StepperButton extends StatelessWidget {
       child: SizedBox(
         width: 28,
         height: 40,
-        child: Icon(icon, size: 14, color: GymTheme.textPrimary),
+        child: Icon(icon, size: 14, color: GymTheme.getTextPrimaryColor(context)),
       ),
     );
   }

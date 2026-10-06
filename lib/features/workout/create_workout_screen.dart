@@ -280,7 +280,7 @@ class _CreateWorkoutScreenState extends ConsumerState<CreateWorkoutScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: GymTheme.background,
+      backgroundColor: GymTheme.getBackgroundColor(context),
       body: SafeArea(
         child: Column(
           children: [
@@ -291,9 +291,9 @@ class _CreateWorkoutScreenState extends ConsumerState<CreateWorkoutScreen> {
                 children: [
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.arrow_back_rounded,
-                      color: GymTheme.textPrimary,
+                      color: GymTheme.getTextPrimaryColor(context),
                     ),
                   ),
                   const Expanded(
@@ -536,8 +536,8 @@ class _CreateWorkoutScreenState extends ConsumerState<CreateWorkoutScreen> {
             Container(
               padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
               decoration: BoxDecoration(
-                color: GymTheme.surface.withValues(alpha: 0.96),
-                border: const Border(top: BorderSide(color: GymTheme.border)),
+                color: GymTheme.getSurfaceColor(context).withValues(alpha: 0.96),
+                border: Border(top: BorderSide(color: GymTheme.getBorderColor(context))),
               ),
               child: SafeArea(
                 top: false,
@@ -605,9 +605,9 @@ class _EmptyExercisesState extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
       decoration: BoxDecoration(
-        color: GymTheme.surface,
+        color: GymTheme.getSurfaceColor(context),
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: GymTheme.border),
+        border: Border.all(color: GymTheme.getBorderColor(context)),
       ),
       child: Column(
         children: [
@@ -625,12 +625,12 @@ class _EmptyExercisesState extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'No exercises yet',
             style: TextStyle(
               fontWeight: FontWeight.w800,
               fontSize: 17,
-              color: GymTheme.textPrimary,
+              color: GymTheme.getTextPrimaryColor(context),
             ),
           ),
           const SizedBox(height: 6),
@@ -687,9 +687,9 @@ class _ExerciseCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: GymTheme.surface,
+        color: GymTheme.getSurfaceColor(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: GymTheme.border),
+        border: Border.all(color: GymTheme.getBorderColor(context)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),

@@ -109,8 +109,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       end: Alignment.bottomRight,
                       colors: Theme.of(context).brightness == Brightness.dark
                           ? [
-                              const Color(0xFF2A2A2E).withValues(alpha: 0.90),
-                              const Color(0xFF1E1E22).withValues(alpha: 0.85),
+                              const Color(0xFF292C3E).withValues(alpha: 0.95),
+                              const Color(0xFF1F2130).withValues(alpha: 0.90),
                             ]
                           : [
                               Colors.white.withValues(alpha: 0.72),
@@ -123,7 +123,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     ),
                     border: Border.all(
                       color: Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xFF3A3A3C)
+                          ? const Color(0xFF383C52)
                           : Colors.white.withValues(alpha: 0.85),
                       width: 1.4,
                     ),

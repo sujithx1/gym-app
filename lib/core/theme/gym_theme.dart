@@ -10,11 +10,11 @@ class GymTheme {
 
   // Soft Pastel Card Tokens (Matching Reference Image)
   static const Color periwinkle = Color(0xFFC5C6F6); // Soft Periwinkle Blue
-  static const Color yellow = Color(0xFFF5DE82);     // Warm Golden Yellow
-  static const Color mint = Color(0xFFC2E2D2);       // Botanical Sage Mint
-  static const Color peach = Color(0xFFF5DCD1);      // Soft Blush Peach
-  static const Color lavender = Color(0xFFE3D8F5);   // Editorial Soft Lavender
-  static const Color blue = Color(0xFFC5C6F6);       // Alias for periwinkle
+  static const Color yellow = Color(0xFFF5DE82); // Warm Golden Yellow
+  static const Color mint = Color(0xFFC2E2D2); // Botanical Sage Mint
+  static const Color peach = Color(0xFFF5DCD1); // Soft Blush Peach
+  static const Color lavender = Color(0xFFE3D8F5); // Editorial Soft Lavender
+  static const Color blue = Color(0xFFC5C6F6); // Alias for periwinkle
 
   // Dark Accent Colors for badges/arrows inside pastel cards
   static const Color periwinkleDark = Color(0xFF8688E2);
@@ -35,42 +35,64 @@ class GymTheme {
   static const Color textSecondary = Color(0xFF7A7A7A);
   static const Color textMuted = Color(0xFF9E9E9E);
 
-  // Dark Theme Palette
-  static const Color darkBackground = Color(0xFF121214);
-  static const Color darkSurface = Color(0xFF1E1E22);
-  static const Color darkSurfaceElevated = Color(0xFF2A2A2E);
-  static const Color darkBorder = Color(0xFF323236);
-  static const Color darkTextPrimary = Color(0xFFF5F5F7);
-  static const Color darkTextSecondary = Color(0xFFA1A1A6);
-  static const Color darkTextMuted = Color(0xFF6E6E73);
+  // Dark Theme Palette (Matching Reference UI: Sleek Deep Slate Navy, Not Pure Black)
+  static const Color darkBackground = Color(0xFF1B1C28); // Deep Slate Navy
+  static const Color darkSurface = Color(
+    0xFF252837,
+  ); // Smooth Slate Card Surface
+  static const Color darkSurfaceElevated = Color(
+    0xFF32364A,
+  ); // Elevated Slate Component
+  static const Color darkBorder = Color(0xFF383C52); // Crisp Dark Border
+  static const Color darkTextPrimary = Color(
+    0xFFFFFFFF,
+  ); // Pure Crisp White Text
+  static const Color darkTextSecondary = Color(
+    0xFF94A3B8,
+  ); // Soft Slate Grey Secondary Text
+  static const Color darkTextMuted = Color(0xFF64748B); // Muted Slate Text
 
   // Context-Aware Dynamic Theme Helpers
   static Color getBackgroundColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark ? darkBackground : background;
+    return Theme.of(context).brightness == Brightness.dark
+        ? darkBackground
+        : background;
   }
 
   static Color getSurfaceColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark ? darkSurface : surface;
+    return Theme.of(context).brightness == Brightness.dark
+        ? darkSurface
+        : surface;
   }
 
   static Color getSurfaceElevatedColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark ? darkSurfaceElevated : surfaceElevated;
+    return Theme.of(context).brightness == Brightness.dark
+        ? darkSurfaceElevated
+        : surfaceElevated;
   }
 
   static Color getBorderColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark ? darkBorder : border;
+    return Theme.of(context).brightness == Brightness.dark
+        ? darkBorder
+        : border;
   }
 
   static Color getTextPrimaryColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark ? darkTextPrimary : textPrimary;
+    return Theme.of(context).brightness == Brightness.dark
+        ? darkTextPrimary
+        : textPrimary;
   }
 
   static Color getTextSecondaryColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark ? darkTextSecondary : textSecondary;
+    return Theme.of(context).brightness == Brightness.dark
+        ? darkTextSecondary
+        : textSecondary;
   }
 
   static Color getPrimaryColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark ? Colors.white : primary;
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : primary;
   }
 
   static ThemeData get lightTheme {
@@ -93,12 +115,31 @@ class GymTheme {
       ),
       textTheme: GoogleFonts.interTextTheme(
         const TextTheme(
-          displayLarge: TextStyle(color: textPrimary, fontWeight: FontWeight.w800, fontSize: 36, letterSpacing: -0.5),
-          titleLarge: TextStyle(color: textPrimary, fontWeight: FontWeight.w800, fontSize: 24, letterSpacing: -0.3),
-          titleMedium: TextStyle(color: textPrimary, fontWeight: FontWeight.w700, fontSize: 17),
+          displayLarge: TextStyle(
+            color: textPrimary,
+            fontWeight: FontWeight.w800,
+            fontSize: 36,
+            letterSpacing: -0.5,
+          ),
+          titleLarge: TextStyle(
+            color: textPrimary,
+            fontWeight: FontWeight.w800,
+            fontSize: 24,
+            letterSpacing: -0.3,
+          ),
+          titleMedium: TextStyle(
+            color: textPrimary,
+            fontWeight: FontWeight.w700,
+            fontSize: 17,
+          ),
           bodyLarge: TextStyle(color: textPrimary, fontSize: 15, height: 1.4),
           bodyMedium: TextStyle(color: textSecondary, fontSize: 14),
-          labelSmall: TextStyle(color: textMuted, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.8),
+          labelSmall: TextStyle(
+            color: textMuted,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.8,
+          ),
         ),
       ),
       appBarTheme: const AppBarTheme(
@@ -106,7 +147,11 @@ class GymTheme {
         elevation: 0,
         centerTitle: false,
         iconTheme: IconThemeData(color: textPrimary),
-        titleTextStyle: TextStyle(color: textPrimary, fontWeight: FontWeight.w800, fontSize: 20),
+        titleTextStyle: TextStyle(
+          color: textPrimary,
+          fontWeight: FontWeight.w800,
+          fontSize: 20,
+        ),
       ),
     );
   }
@@ -131,12 +176,35 @@ class GymTheme {
       ),
       textTheme: GoogleFonts.interTextTheme(
         ThemeData.dark().textTheme.copyWith(
-          displayLarge: const TextStyle(color: darkTextPrimary, fontWeight: FontWeight.w800, fontSize: 36, letterSpacing: -0.5),
-          titleLarge: const TextStyle(color: darkTextPrimary, fontWeight: FontWeight.w800, fontSize: 24, letterSpacing: -0.3),
-          titleMedium: const TextStyle(color: darkTextPrimary, fontWeight: FontWeight.w700, fontSize: 17),
-          bodyLarge: const TextStyle(color: darkTextPrimary, fontSize: 15, height: 1.4),
+          displayLarge: const TextStyle(
+            color: darkTextPrimary,
+            fontWeight: FontWeight.w800,
+            fontSize: 36,
+            letterSpacing: -0.5,
+          ),
+          titleLarge: const TextStyle(
+            color: darkTextPrimary,
+            fontWeight: FontWeight.w800,
+            fontSize: 24,
+            letterSpacing: -0.3,
+          ),
+          titleMedium: const TextStyle(
+            color: darkTextPrimary,
+            fontWeight: FontWeight.w700,
+            fontSize: 17,
+          ),
+          bodyLarge: const TextStyle(
+            color: darkTextPrimary,
+            fontSize: 15,
+            height: 1.4,
+          ),
           bodyMedium: const TextStyle(color: darkTextSecondary, fontSize: 14),
-          labelSmall: const TextStyle(color: darkTextMuted, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.8),
+          labelSmall: const TextStyle(
+            color: darkTextMuted,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.8,
+          ),
         ),
       ),
       appBarTheme: const AppBarTheme(
@@ -144,9 +212,12 @@ class GymTheme {
         elevation: 0,
         centerTitle: false,
         iconTheme: IconThemeData(color: darkTextPrimary),
-        titleTextStyle: TextStyle(color: darkTextPrimary, fontWeight: FontWeight.w800, fontSize: 20),
+        titleTextStyle: TextStyle(
+          color: darkTextPrimary,
+          fontWeight: FontWeight.w800,
+          fontSize: 20,
+        ),
       ),
     );
   }
 }
-

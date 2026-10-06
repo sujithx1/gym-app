@@ -21,7 +21,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
     final progressAsync = ref.watch(progressOverviewProvider);
 
     return Scaffold(
-      backgroundColor: GymTheme.background,
+      backgroundColor: GymTheme.getBackgroundColor(context),
       body: SafeArea(
         child: TreadmillRefreshIndicator(
           onRefresh: () async {
@@ -44,12 +44,12 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
+                Text(
                   'Based on your logs',
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w900,
-                    color: GymTheme.textPrimary,
+                    color: GymTheme.getTextPrimaryColor(context),
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -191,8 +191,8 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                     ),
                     DropdownButton<String>(
                       value: _selectedExercise,
-                      dropdownColor: GymTheme.surface,
-                      style: const TextStyle(color: GymTheme.textPrimary, fontWeight: FontWeight.w800, fontSize: 13),
+                      dropdownColor: GymTheme.getSurfaceColor(context),
+                      style: TextStyle(color: GymTheme.getTextPrimaryColor(context), fontWeight: FontWeight.w800, fontSize: 13),
                       underline: const SizedBox(),
                       items: ['Bench Press', 'Barbell Squat', 'Deadlift', 'Overhead Press']
                           .map((e) => DropdownMenuItem(value: e, child: Text(e)))
@@ -216,16 +216,18 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                         margin: const EdgeInsets.only(right: 8),
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          color: isSelected ? GymTheme.primary : GymTheme.surface,
+                          color: isSelected ? GymTheme.getPrimaryColor(context) : GymTheme.getSurfaceColor(context),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: isSelected ? GymTheme.primary : GymTheme.border),
+                          border: Border.all(color: isSelected ? GymTheme.getPrimaryColor(context) : GymTheme.getBorderColor(context)),
                         ),
                         child: Text(
                           timeFrame,
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w800,
-                            color: isSelected ? Colors.white : GymTheme.textSecondary,
+                            color: isSelected
+                                ? (Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white)
+                                : GymTheme.getTextSecondaryColor(context),
                           ),
                         ),
                       ),
@@ -239,16 +241,16 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                   height: 200,
                   padding: const EdgeInsets.fromLTRB(16, 24, 24, 16),
                   decoration: BoxDecoration(
-                    color: GymTheme.surface,
+                    color: GymTheme.getSurfaceColor(context),
                     borderRadius: BorderRadius.circular(28),
-                    border: Border.all(color: GymTheme.border),
+                    border: Border.all(color: GymTheme.getBorderColor(context)),
                   ),
                   child: LineChart(
                     LineChartData(
                       gridData: FlGridData(
                         show: true,
                         drawVerticalLine: false,
-                        getDrawingHorizontalLine: (_) => const FlLine(color: GymTheme.border, strokeWidth: 1),
+                        getDrawingHorizontalLine: (_) => FlLine(color: GymTheme.getBorderColor(context), strokeWidth: 1),
                       ),
                       titlesData: FlTitlesData(
                         rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -263,7 +265,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                               if (index >= 0 && index < months.length) {
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 8.0),
-                                  child: Text(months[index], style: const TextStyle(color: GymTheme.textMuted, fontSize: 11, fontWeight: FontWeight.bold)),
+                                  child: Text(months[index], style: TextStyle(color: GymTheme.getTextSecondaryColor(context), fontSize: 11, fontWeight: FontWeight.bold)),
                                 );
                               }
                               return const SizedBox.shrink();
@@ -281,7 +283,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                             FlSpot(3, 80),
                           ],
                           isCurved: true,
-                          color: GymTheme.primary,
+                          color: GymTheme.getPrimaryColor(context),
                           barWidth: 3.5,
                           isStrokeCapRound: true,
                           dotData: const FlDotData(show: true),
@@ -307,9 +309,9 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                   height: 180,
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: GymTheme.surface,
+                    color: GymTheme.getSurfaceColor(context),
                     borderRadius: BorderRadius.circular(28),
-                    border: Border.all(color: GymTheme.border),
+                    border: Border.all(color: GymTheme.getBorderColor(context)),
                   ),
                   child: BarChart(
                     BarChartData(
@@ -445,9 +447,9 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: GymTheme.surface,
+        color: GymTheme.getSurfaceColor(context),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: GymTheme.border),
+        border: Border.all(color: GymTheme.getBorderColor(context)),
       ),
       child: Row(
         children: [
@@ -468,12 +470,12 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
             children: [
               Text(
                 title,
-                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: GymTheme.textPrimary),
+                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: GymTheme.getTextPrimaryColor(context)),
               ),
               const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: GymTheme.textSecondary),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: GymTheme.getTextSecondaryColor(context)),
               ),
             ],
           ),
