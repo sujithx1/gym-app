@@ -4,6 +4,11 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "bun --watch src/index.ts",
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
     "seed": "bun run src/db/seed.ts"
   },
   "dependencies": {
