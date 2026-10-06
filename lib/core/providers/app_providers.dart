@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../networking/api_client.dart';
 
 class ApiLoadingNotifier extends StateNotifier<int> {
@@ -218,4 +220,38 @@ class ServerUrlNotifier extends StateNotifier<String> {
 
 final serverUrlProvider = StateNotifierProvider<ServerUrlNotifier, String>((ref) {
   return ServerUrlNotifier(ref.watch(apiClientProvider), ref);
+});
+
+// Theme Mode Provider (Light, Dark, System)
+class ThemeModeNotifier extends StateNotifier<ThemeMode> {
+  static const String _key = 'user_theme_mode';
+
+  ThemeModeNotifier() : super(ThemeMode.light) {
+    _loadTheme();
+  }
+
+  Future<void> _loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    final str = prefs.getString(_key);
+    if (str == 'dark') {
+      state = ThemeMode.dark;
+    } else if (str == 'system') {
+      state = ThemeMode.system;
+    } else {
+      state = ThemeMode.light;
+    }
+  }
+
+  Future<void> setThemeMode(ThemeMode mode) async {
+    state = mode;
+    final prefs = await SharedPreferences.getInstance();
+    String val = 'light';
+    if (mode == ThemeMode.dark) val = 'dark';
+    if (mode == ThemeMode.system) val = 'system';
+    await prefs.setString(_key, val);
+  }
+}
+
+final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
+  return ThemeModeNotifier();
 });

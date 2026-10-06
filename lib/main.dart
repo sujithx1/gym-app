@@ -23,11 +23,14 @@ class GymWorkoutApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
+    final themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp(
       title: 'Gym Workout Tracker',
       debugShowCheckedModeBanner: false,
       theme: GymTheme.lightTheme,
+      darkTheme: GymTheme.darkTheme,
+      themeMode: themeMode,
       builder: (context, child) {
         return GlobalTreadmillOverlay(child: child ?? const SizedBox.shrink());
       },
@@ -104,15 +107,24 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [
-                        Colors.white.withValues(alpha: 0.72),
-                        Colors.white.withValues(alpha: 0.42),
-                        GymTheme.periwinkle.withValues(alpha: 0.18),
-                      ],
-                      stops: const [0.0, 0.55, 1.0],
+                      colors: Theme.of(context).brightness == Brightness.dark
+                          ? [
+                              const Color(0xFF2A2A2E).withValues(alpha: 0.90),
+                              const Color(0xFF1E1E22).withValues(alpha: 0.85),
+                            ]
+                          : [
+                              Colors.white.withValues(alpha: 0.72),
+                              Colors.white.withValues(alpha: 0.42),
+                              GymTheme.periwinkle.withValues(alpha: 0.18),
+                            ],
+                      stops: Theme.of(context).brightness == Brightness.dark
+                          ? const [0.0, 1.0]
+                          : const [0.0, 0.55, 1.0],
                     ),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.85),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF3A3A3C)
+                          : Colors.white.withValues(alpha: 0.85),
                       width: 1.4,
                     ),
                   ),

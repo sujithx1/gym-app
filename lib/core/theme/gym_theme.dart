@@ -35,6 +35,44 @@ class GymTheme {
   static const Color textSecondary = Color(0xFF7A7A7A);
   static const Color textMuted = Color(0xFF9E9E9E);
 
+  // Dark Theme Palette
+  static const Color darkBackground = Color(0xFF121214);
+  static const Color darkSurface = Color(0xFF1E1E22);
+  static const Color darkSurfaceElevated = Color(0xFF2A2A2E);
+  static const Color darkBorder = Color(0xFF323236);
+  static const Color darkTextPrimary = Color(0xFFF5F5F7);
+  static const Color darkTextSecondary = Color(0xFFA1A1A6);
+  static const Color darkTextMuted = Color(0xFF6E6E73);
+
+  // Context-Aware Dynamic Theme Helpers
+  static Color getBackgroundColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark ? darkBackground : background;
+  }
+
+  static Color getSurfaceColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark ? darkSurface : surface;
+  }
+
+  static Color getSurfaceElevatedColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark ? darkSurfaceElevated : surfaceElevated;
+  }
+
+  static Color getBorderColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark ? darkBorder : border;
+  }
+
+  static Color getTextPrimaryColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark ? darkTextPrimary : textPrimary;
+  }
+
+  static Color getTextSecondaryColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark ? darkTextSecondary : textSecondary;
+  }
+
+  static Color getPrimaryColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark ? Colors.white : primary;
+  }
+
   static ThemeData get lightTheme {
     return ThemeData.light().copyWith(
       scaffoldBackgroundColor: background,
@@ -69,6 +107,44 @@ class GymTheme {
         centerTitle: false,
         iconTheme: IconThemeData(color: textPrimary),
         titleTextStyle: TextStyle(color: textPrimary, fontWeight: FontWeight.w800, fontSize: 20),
+      ),
+    );
+  }
+
+  static ThemeData get darkTheme {
+    return ThemeData.dark().copyWith(
+      scaffoldBackgroundColor: darkBackground,
+      primaryColor: Colors.white,
+      colorScheme: const ColorScheme.dark(
+        primary: Colors.white,
+        secondary: darkTextSecondary,
+        surface: darkSurface,
+        error: danger,
+      ),
+      cardTheme: CardThemeData(
+        color: darkSurface,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28),
+          side: const BorderSide(color: darkBorder, width: 1),
+        ),
+      ),
+      textTheme: GoogleFonts.interTextTheme(
+        ThemeData.dark().textTheme.copyWith(
+          displayLarge: const TextStyle(color: darkTextPrimary, fontWeight: FontWeight.w800, fontSize: 36, letterSpacing: -0.5),
+          titleLarge: const TextStyle(color: darkTextPrimary, fontWeight: FontWeight.w800, fontSize: 24, letterSpacing: -0.3),
+          titleMedium: const TextStyle(color: darkTextPrimary, fontWeight: FontWeight.w700, fontSize: 17),
+          bodyLarge: const TextStyle(color: darkTextPrimary, fontSize: 15, height: 1.4),
+          bodyMedium: const TextStyle(color: darkTextSecondary, fontSize: 14),
+          labelSmall: const TextStyle(color: darkTextMuted, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.8),
+        ),
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: darkBackground,
+        elevation: 0,
+        centerTitle: false,
+        iconTheme: IconThemeData(color: darkTextPrimary),
+        titleTextStyle: TextStyle(color: darkTextPrimary, fontWeight: FontWeight.w800, fontSize: 20),
       ),
     );
   }

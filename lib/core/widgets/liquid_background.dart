@@ -45,7 +45,7 @@ class _LiquidBackgroundState extends State<LiquidBackground>
     return Stack(
       children: [
         // Background Base
-        Positioned.fill(child: Container(color: GymTheme.background)),
+        Positioned.fill(child: Container(color: GymTheme.getBackgroundColor(context))),
 
         // Animated Liquid Blob Canvas on Top, Sides, & Bottom
         Positioned.fill(
@@ -183,11 +183,11 @@ class _LiquidCardState extends State<LiquidCard>
           onTap: widget.onTap,
           child: Container(
             decoration: BoxDecoration(
-              color: GymTheme.surface,
+              color: GymTheme.getSurfaceColor(context),
               borderRadius: br,
               border: Border.all(
                 color: Color.lerp(
-                  GymTheme.border,
+                  GymTheme.getBorderColor(context),
                   widget.accentColor,
                   0.4 + glowVal * 0.4,
                 )!,

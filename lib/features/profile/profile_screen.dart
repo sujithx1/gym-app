@@ -12,7 +12,6 @@ class ProfileScreen extends ConsumerStatefulWidget {
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   String _unit = 'kg';
-  final String _theme = 'Light';
   bool _restTimer = true;
   bool _notifications = true;
 
@@ -23,7 +22,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final syncState = ref.watch(syncProvider);
 
     return Scaffold(
-      backgroundColor: GymTheme.background,
+      backgroundColor: GymTheme.getBackgroundColor(context),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 110),
@@ -43,10 +42,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               const SizedBox(height: 4),
               Text(
                 authState.username ?? 'Sujith',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.w900,
-                  color: GymTheme.textPrimary,
+                  color: GymTheme.getTextPrimaryColor(context),
                   letterSpacing: -0.5,
                 ),
               ),
@@ -63,9 +62,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   return Container(
                     padding: const EdgeInsets.all(22),
                     decoration: BoxDecoration(
-                      color: GymTheme.surface,
+                      color: GymTheme.getSurfaceColor(context),
                       borderRadius: BorderRadius.circular(28),
-                      border: Border.all(color: GymTheme.border),
+                      border: Border.all(color: GymTheme.getBorderColor(context)),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.03),
@@ -78,15 +77,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         _buildStatColumn('$workouts', 'Workouts'),
-                        Container(height: 36, width: 1, color: GymTheme.border),
+                        Container(height: 36, width: 1, color: GymTheme.getBorderColor(context)),
                         _buildStatColumn('$streak Days', 'Streak'),
-                        Container(height: 36, width: 1, color: GymTheme.border),
+                        Container(height: 36, width: 1, color: GymTheme.getBorderColor(context)),
                         _buildStatColumn('${(volume / 1000).toStringAsFixed(0)}K kg', 'Volume'),
                       ],
                     ),
                   );
                 },
-                loading: () => Container(height: 80, decoration: BoxDecoration(color: GymTheme.surface, borderRadius: BorderRadius.circular(28))),
+                loading: () => Container(height: 80, decoration: BoxDecoration(color: GymTheme.getSurfaceColor(context), borderRadius: BorderRadius.circular(28))),
                 error: (_, stack) => const SizedBox.shrink(),
               ),
               const SizedBox(height: 28),
@@ -105,12 +104,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: GymTheme.surface,
+                  color: GymTheme.getSurfaceColor(context),
                   borderRadius: BorderRadius.circular(28),
                   border: Border.all(
                     color: syncState.pendingCount > 0
                         ? GymTheme.warning.withValues(alpha: 0.5)
-                        : GymTheme.border,
+                        : GymTheme.getBorderColor(context),
                   ),
                 ),
                 child: Column(
@@ -141,12 +140,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'Local Data Sync',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w800,
                                   fontSize: 16,
-                                  color: GymTheme.textPrimary,
+                                  color: GymTheme.getTextPrimaryColor(context),
                                 ),
                               ),
                               const SizedBox(height: 2),
@@ -159,7 +158,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                   fontWeight: FontWeight.w600,
                                   color: syncState.pendingCount > 0
                                       ? GymTheme.warning
-                                      : GymTheme.textSecondary,
+                                      : GymTheme.getTextSecondaryColor(context),
                                 ),
                               ),
                             ],
@@ -228,9 +227,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: GymTheme.background,
+                        color: GymTheme.getBackgroundColor(context),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: GymTheme.border),
+                        border: Border.all(color: GymTheme.getBorderColor(context)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -254,21 +253,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       'Server API Base URL',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w800,
                                         fontSize: 14,
-                                        color: GymTheme.textPrimary,
+                                        color: GymTheme.getTextPrimaryColor(context),
                                       ),
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
                                       ref.watch(serverUrlProvider),
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
-                                        color: GymTheme.textSecondary,
+                                        color: GymTheme.getTextSecondaryColor(context),
                                       ),
                                     ),
                                   ],
@@ -283,18 +282,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             child: OutlinedButton.icon(
                               onPressed: () => _showBaseUrlModal(context),
                               style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: GymTheme.border),
+                                side: BorderSide(color: GymTheme.getBorderColor(context)),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                               ),
-                              icon: const Icon(Icons.edit_outlined, size: 16, color: GymTheme.textPrimary),
-                              label: const Text(
+                              icon: Icon(Icons.edit_outlined, size: 16, color: GymTheme.getTextPrimaryColor(context)),
+                              label: Text(
                                 'CHANGE SERVER IP / URL',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w800,
                                   fontSize: 11,
-                                  color: GymTheme.textPrimary,
+                                  color: GymTheme.getTextPrimaryColor(context),
                                   letterSpacing: 0.8,
                                 ),
                               ),
@@ -322,28 +321,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               // Settings Options Container
               Container(
                 decoration: BoxDecoration(
-                  color: GymTheme.surface,
+                  color: GymTheme.getSurfaceColor(context),
                   borderRadius: BorderRadius.circular(28),
-                  border: Border.all(color: GymTheme.border),
+                  border: Border.all(color: GymTheme.getBorderColor(context)),
                 ),
                 child: Column(
                   children: [
                     // Units Setting
                     ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-                      title: const Text('Units', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: GymTheme.textPrimary)),
+                      title: Text('Units', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: GymTheme.getTextPrimaryColor(context))),
                       trailing: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                         decoration: BoxDecoration(
-                          color: GymTheme.background,
+                          color: GymTheme.getBackgroundColor(context),
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: GymTheme.border),
+                          border: Border.all(color: GymTheme.getBorderColor(context)),
                         ),
                         child: DropdownButton<String>(
                           value: _unit,
                           underline: const SizedBox(),
-                          dropdownColor: GymTheme.surface,
-                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: GymTheme.textPrimary),
+                          dropdownColor: GymTheme.getSurfaceColor(context),
+                          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: GymTheme.getTextPrimaryColor(context)),
                           items: ['kg', 'lbs'].map((u) => DropdownMenuItem(value: u, child: Text(u))).toList(),
                           onChanged: (val) {
                             if (val != null) setState(() => _unit = val);
@@ -351,43 +350,56 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ),
                       ),
                     ),
-                    const Divider(color: GymTheme.border, height: 1),
+                    Divider(color: GymTheme.getBorderColor(context), height: 1),
 
                     // Theme Setting
                     ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-                      title: const Text('Theme', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: GymTheme.textPrimary)),
+                      title: Text('App Theme', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: GymTheme.getTextPrimaryColor(context))),
+                      subtitle: Text('Switch between Light and Dark mode', style: TextStyle(fontSize: 12, color: GymTheme.getTextSecondaryColor(context))),
                       trailing: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                         decoration: BoxDecoration(
-                          color: GymTheme.background,
+                          color: GymTheme.getBackgroundColor(context),
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: GymTheme.border),
+                          border: Border.all(color: GymTheme.getBorderColor(context)),
                         ),
-                        child: Text(
-                          _theme,
-                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: GymTheme.textPrimary),
+                        child: DropdownButton<ThemeMode>(
+                          value: ref.watch(themeModeProvider),
+                          underline: const SizedBox(),
+                          dropdownColor: GymTheme.getSurfaceColor(context),
+                          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: GymTheme.getTextPrimaryColor(context)),
+                          items: const [
+                            DropdownMenuItem(value: ThemeMode.light, child: Text('Light ☀️')),
+                            DropdownMenuItem(value: ThemeMode.dark, child: Text('Dark 🌙')),
+                            DropdownMenuItem(value: ThemeMode.system, child: Text('System 📱')),
+                          ],
+                          onChanged: (mode) {
+                            if (mode != null) {
+                              ref.read(themeModeProvider.notifier).setThemeMode(mode);
+                            }
+                          },
                         ),
                       ),
                     ),
-                    const Divider(color: GymTheme.border, height: 1),
+                    Divider(color: GymTheme.getBorderColor(context), height: 1),
 
                     // Rest Timer Setting
                     SwitchListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-                      title: const Text('Rest Timer', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: GymTheme.textPrimary)),
-                      subtitle: const Text('Auto start timer between sets', style: TextStyle(fontSize: 12, color: GymTheme.textSecondary)),
+                      title: Text('Rest Timer', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: GymTheme.getTextPrimaryColor(context))),
+                      subtitle: Text('Auto start timer between sets', style: TextStyle(fontSize: 12, color: GymTheme.getTextSecondaryColor(context))),
                       value: _restTimer,
                       activeTrackColor: GymTheme.primary,
                       onChanged: (val) => setState(() => _restTimer = val),
                     ),
-                    const Divider(color: GymTheme.border, height: 1),
+                    Divider(color: GymTheme.getBorderColor(context), height: 1),
 
                     // Notifications Setting
                     SwitchListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-                      title: const Text('Notifications', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: GymTheme.textPrimary)),
-                      subtitle: const Text('Daily workout reminders', style: TextStyle(fontSize: 12, color: GymTheme.textSecondary)),
+                      title: Text('Notifications', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: GymTheme.getTextPrimaryColor(context))),
+                      subtitle: Text('Daily workout reminders', style: TextStyle(fontSize: 12, color: GymTheme.getTextSecondaryColor(context))),
                       value: _notifications,
                       activeTrackColor: GymTheme.primary,
                       onChanged: (val) => setState(() => _notifications = val),
@@ -427,12 +439,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       children: [
         Text(
           val,
-          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: GymTheme.textPrimary),
+          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: GymTheme.getTextPrimaryColor(context)),
         ),
         const SizedBox(height: 2),
         Text(
           label,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: GymTheme.textSecondary),
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: GymTheme.getTextSecondaryColor(context)),
         ),
       ],
     );
@@ -478,9 +490,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               child: Container(
                 padding: const EdgeInsets.all(24),
-                decoration: const BoxDecoration(
-                  color: GymTheme.surface,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+                decoration: BoxDecoration(
+                  color: GymTheme.getSurfaceColor(context),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
                 ),
                 child: SingleChildScrollView(
                   child: Column(
@@ -492,26 +504,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           width: 40,
                           height: 4,
                           decoration: BoxDecoration(
-                            color: GymTheme.border,
+                            color: GymTheme.getBorderColor(context),
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Text(
+                      Text(
                         'Configure Server Base URL',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w900,
-                          color: GymTheme.textPrimary,
+                          color: GymTheme.getTextPrimaryColor(context),
                         ),
                       ),
                       const SizedBox(height: 6),
-                      const Text(
+                      Text(
                         'Set local network IP (e.g. 10.5.51.191:3001) or localhost URL:',
                         style: TextStyle(
                           fontSize: 13,
-                          color: GymTheme.textSecondary,
+                          color: GymTheme.getTextSecondaryColor(context),
                         ),
                       ),
                       const SizedBox(height: 18),
@@ -520,8 +532,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         controller: controller,
                         autofocus: true,
                         keyboardType: TextInputType.url,
-                        style: const TextStyle(
-                          color: GymTheme.textPrimary,
+                        style: TextStyle(
+                          color: GymTheme.getTextPrimaryColor(context),
                           fontWeight: FontWeight.w700,
                         ),
                         decoration: InputDecoration(
@@ -529,10 +541,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           hintText: 'e.g. http://10.5.51.191:3001',
                           prefixIcon: const Icon(Icons.link, color: GymTheme.primary),
                           filled: true,
-                          fillColor: GymTheme.background,
+                          fillColor: GymTheme.getBackgroundColor(context),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
-                            borderSide: const BorderSide(color: GymTheme.border),
+                            borderSide: BorderSide(color: GymTheme.getBorderColor(context)),
                           ),
                         ),
                       ),
@@ -563,12 +575,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
-                                color: isSelected ? Colors.white : GymTheme.textPrimary,
+                                color: isSelected ? Colors.white : GymTheme.getTextPrimaryColor(context),
                               ),
                             ),
                             selected: isSelected,
                             selectedColor: GymTheme.primary,
-                            backgroundColor: GymTheme.background,
+                            backgroundColor: GymTheme.getBackgroundColor(context),
                             onSelected: (_) {
                               setModalState(() {
                                 controller.text = ip;

@@ -23,7 +23,7 @@ class HomeScreen extends ConsumerWidget {
     final authState = ref.watch(authProvider);
 
     return Scaffold(
-      backgroundColor: GymTheme.background,
+      backgroundColor: GymTheme.getBackgroundColor(context),
       body: SafeArea(
         child: TreadmillRefreshIndicator(
           onRefresh: () async {
