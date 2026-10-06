@@ -1,7 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppConfig {
-  static const String defaultBaseUrl = 'http://127.0.0.1:3001';
+  static const String defaultBaseUrl = 'https://gym-app-humo.onrender.com';
   static const String _baseUrlKey = 'custom_server_base_url';
 
   /// Returns stored custom base URL or default (e.g. http://127.0.0.1:3001)
