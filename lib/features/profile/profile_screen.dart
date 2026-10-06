@@ -222,6 +222,87 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 16),
+
+                    // Server API Base URL Card
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: GymTheme.background,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: GymTheme.border),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: GymTheme.primary.withValues(alpha: 0.15),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.dns_rounded,
+                                  color: GymTheme.primary,
+                                  size: 18,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Server API Base URL',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 14,
+                                        color: GymTheme.textPrimary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      ref.watch(serverUrlProvider),
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: GymTheme.textSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 40,
+                            child: OutlinedButton.icon(
+                              onPressed: () => _showBaseUrlModal(context),
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: GymTheme.border),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                              icon: const Icon(Icons.edit_outlined, size: 16, color: GymTheme.textPrimary),
+                              label: const Text(
+                                'CHANGE SERVER IP / URL',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 11,
+                                  color: GymTheme.textPrimary,
+                                  letterSpacing: 0.8,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -354,6 +435,231 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: GymTheme.textSecondary),
         ),
       ],
+    );
+  }
+
+  void _showBaseUrlModal(BuildContext context) {
+    final currentUrl = ref.read(serverUrlProvider);
+    final controller = TextEditingController(text: currentUrl);
+    bool isTesting = false;
+    bool? testSuccess;
+    String? testMessage;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (modalContext) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            Future<void> testConnection() async {
+              setModalState(() {
+                isTesting = true;
+                testSuccess = null;
+                testMessage = null;
+              });
+
+              final ok = await ref
+                  .read(serverUrlProvider.notifier)
+                  .testConnection(controller.text);
+
+              setModalState(() {
+                isTesting = false;
+                testSuccess = ok;
+                testMessage = ok
+                    ? 'Connected successfully to backend server!'
+                    : 'Could not connect. Ensure server is running on network IP.';
+              });
+            }
+
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: const BoxDecoration(
+                  color: GymTheme.surface,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: GymTheme.border,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Configure Server Base URL',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                          color: GymTheme.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Set local network IP (e.g. 10.5.51.191:3001) or localhost URL:',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: GymTheme.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+
+                      TextField(
+                        controller: controller,
+                        autofocus: true,
+                        keyboardType: TextInputType.url,
+                        style: const TextStyle(
+                          color: GymTheme.textPrimary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: 'Server Base URL',
+                          hintText: 'e.g. http://10.5.51.191:3001',
+                          prefixIcon: const Icon(Icons.link, color: GymTheme.primary),
+                          filled: true,
+                          fillColor: GymTheme.background,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: const BorderSide(color: GymTheme.border),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Quick IP Presets
+                      const Text(
+                        'Quick Presets:',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: GymTheme.textMuted,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          'http://127.0.0.1:3001',
+                          'http://10.0.2.2:3001',
+                          'http://10.5.51.191:3001',
+                        ].map((ip) {
+                          final isSelected = controller.text == ip;
+                          return ChoiceChip(
+                            label: Text(
+                              ip,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: isSelected ? Colors.white : GymTheme.textPrimary,
+                              ),
+                            ),
+                            selected: isSelected,
+                            selectedColor: GymTheme.primary,
+                            backgroundColor: GymTheme.background,
+                            onSelected: (_) {
+                              setModalState(() {
+                                controller.text = ip;
+                              });
+                            },
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 16),
+
+                      if (testMessage != null)
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          margin: const EdgeInsets.only(bottom: 14),
+                          decoration: BoxDecoration(
+                            color: testSuccess == true
+                                ? GymTheme.primary.withValues(alpha: 0.15)
+                                : GymTheme.warning.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Text(
+                            testMessage!,
+                            style: TextStyle(
+                              color: testSuccess == true
+                                  ? GymTheme.primary
+                                  : GymTheme.warning,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: isTesting ? null : testConnection,
+                              style: OutlinedButton.styleFrom(
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              ),
+                              icon: isTesting
+                                  ? const SizedBox(
+                                      width: 14,
+                                      height: 14,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    )
+                                  : const Icon(Icons.wifi_tethering, size: 18),
+                              label: const Text('TEST API', style: TextStyle(fontWeight: FontWeight.w800)),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                final newUrl = controller.text.trim();
+                                if (newUrl.isNotEmpty) {
+                                  await ref
+                                      .read(serverUrlProvider.notifier)
+                                      .setUrl(newUrl);
+                                  if (modalContext.mounted) {
+                                    Navigator.pop(modalContext);
+                                  }
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Server Base URL updated to ${ref.read(serverUrlProvider)}'),
+                                        backgroundColor: GymTheme.primary,
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                  }
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: GymTheme.primary,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              ),
+                              child: const Text('SAVE URL', style: TextStyle(fontWeight: FontWeight.w800)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

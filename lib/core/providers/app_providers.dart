@@ -194,3 +194,28 @@ final exercisesProvider = FutureProvider.autoDispose<List<dynamic>>((ref) async 
   final filter = ref.watch(exerciseFilterProvider);
   return await api.getExercises(filter);
 });
+
+// Server URL Provider
+class ServerUrlNotifier extends StateNotifier<String> {
+  final ApiClient _apiClient;
+  final Ref _ref;
+
+  ServerUrlNotifier(this._apiClient, this._ref) : super(_apiClient.rawBaseUrl);
+
+  Future<void> setUrl(String newUrl) async {
+    await _apiClient.updateBaseUrl(newUrl);
+    state = _apiClient.rawBaseUrl;
+    // Invalidate app data providers to refetch using new server URL
+    _ref.invalidate(todayWorkoutProvider);
+    _ref.invalidate(progressOverviewProvider);
+    _ref.invalidate(exercisesProvider);
+  }
+
+  Future<bool> testConnection([String? testUrl]) async {
+    return await _apiClient.testConnection(testUrl);
+  }
+}
+
+final serverUrlProvider = StateNotifierProvider<ServerUrlNotifier, String>((ref) {
+  return ServerUrlNotifier(ref.watch(apiClientProvider), ref);
+});

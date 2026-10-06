@@ -5,13 +5,40 @@ import '../config/app_config.dart';
 import 'offline_sync_manager.dart';
 
 class ApiClient {
-  static const String baseUrl = AppConfig.apiBaseUrl;
+  String _serverBaseUrl = AppConfig.defaultBaseUrl;
   String? _token;
   final void Function()? onRequestStart;
   final void Function()? onRequestEnd;
   final OfflineSyncManager syncManager = OfflineSyncManager();
 
   ApiClient({this.onRequestStart, this.onRequestEnd});
+
+  String get rawBaseUrl => _serverBaseUrl;
+  String get baseUrl => AppConfig.getApiUrl(_serverBaseUrl);
+
+  Future<void> init() async {
+    final prefs = await SharedPreferences.getInstance();
+    _token = prefs.getString('jwt_token');
+    _serverBaseUrl = await AppConfig.getBaseUrl();
+  }
+
+  Future<void> updateBaseUrl(String newUrl) async {
+    _serverBaseUrl = await AppConfig.setBaseUrl(newUrl);
+  }
+
+  Future<bool> testConnection([String? customUrl]) async {
+    final target = customUrl != null && customUrl.trim().isNotEmpty
+        ? AppConfig.getApiUrl(AppConfig.normalizeUrl(customUrl))
+        : baseUrl;
+    try {
+      final res = await http
+          .get(Uri.parse('$target/workouts/today'))
+          .timeout(const Duration(seconds: 3));
+      return res.statusCode == 200 || res.statusCode == 401;
+    } catch (_) {
+      return false;
+    }
+  }
 
   Future<T> _trackRequest<T>(Future<T> Function() fn, {bool showGlobalLoading = true}) async {
     if (showGlobalLoading) {
@@ -24,11 +51,6 @@ class ApiClient {
         onRequestEnd?.call();
       }
     }
-  }
-
-  Future<void> init() async {
-    final prefs = await SharedPreferences.getInstance();
-    _token = prefs.getString('jwt_token');
   }
 
   bool get isAuthenticated => _token != null && _token!.isNotEmpty;
