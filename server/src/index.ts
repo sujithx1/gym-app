@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import { env } from './env';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { initDb } from './db';
@@ -44,7 +44,7 @@ app.route('/api/progress', progressRoutes);
 //   console.error('Database connection warning:', err);
 // });
 
-const PORT = Number(process.env.PORT) || 3001;
+const PORT = env.PORT;
 console.log(`Server starting on port ${PORT}...`);
 
 export default {

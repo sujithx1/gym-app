@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import { env } from '../env';
 import { Context, Next } from 'hono';
 import { jwtVerify, SignJWT } from 'jose';
 
@@ -9,7 +9,7 @@ export type Env = {
   };
 };
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'gym_tracker_secret_key_2026');
+const JWT_SECRET = new TextEncoder().encode(env.JWT_SECRET);
 
 export async function createToken(userId: string, username: string) {
   return await new SignJWT({ userId, username })
