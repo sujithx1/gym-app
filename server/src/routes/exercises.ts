@@ -39,7 +39,7 @@ exerciseRoutes.get('/', async (c) => {
 exerciseRoutes.post('/', async (c) => {
   try {
     const userId = c.get('userId');
-    const { name, muscleGroup, equipment, instructions } = await c.req.json();
+    const { id: providedId, name, muscleGroup, equipment, instructions } = await c.req.json();
 
     console.log(`[Exercises] Creating custom exercise: "${name}" (${muscleGroup}) for user=${userId}`);
     if (!name || !muscleGroup) {
@@ -55,7 +55,7 @@ exerciseRoutes.post('/', async (c) => {
       }).onConflictDoNothing();
     }
 
-    const id = `ex_custom_${Date.now()}`;
+    const id = providedId || `ex_custom_${Date.now()}`;
 
     await (db.insert(exercises) as any).values({
       id,
@@ -65,6 +65,14 @@ exerciseRoutes.post('/', async (c) => {
       instructions: String(instructions || ''),
       isCustom: true,
       userId,
+    }).onConflictDoUpdate({
+      target: exercises.id,
+      set: {
+        name: String(name),
+        muscleGroup: String(muscleGroup),
+        equipment: String(equipment || 'Barbell'),
+        instructions: String(instructions || ''),
+      },
     });
 
     console.log(`✅ [Exercises] Custom exercise created successfully: ${id} (${name})`);

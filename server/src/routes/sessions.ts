@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { eq, and, desc, asc, ne, count } from 'drizzle-orm';
 import { db } from '../db';
-import { workoutSessions, sets, users } from '../db/schema';
+import { workoutSessions, sets, users, exercises } from '../db/schema';
 import { authMiddleware, Env } from '../middleware/auth';
 
 const sessionRoutes = new Hono<Env>();
@@ -123,6 +123,26 @@ sessionRoutes.put('/:id/set', async (c) => {
         name: "Synced Workout",
         startedAt: new Date(),
         status: 'in_progress',
+      }).onConflictDoNothing();
+    }
+
+    // Ensure exercise exists (supports offline exercises syncing back to server)
+    const existingExercise = await db
+      .select({ id: exercises.id })
+      .from(exercises)
+      .where(eq(exercises.id, exerciseId))
+      .limit(1);
+
+    if (existingExercise.length === 0) {
+      console.log(`[Sessions] Exercise ${exerciseId} not found during set log. Auto-creating placeholder exercise...`);
+      await (db.insert(exercises) as any).values({
+        id: exerciseId,
+        name: 'Custom Exercise',
+        muscleGroup: 'Other',
+        equipment: 'Barbell',
+        instructions: '',
+        isCustom: true,
+        userId: userId || 'user_sujith_01',
       }).onConflictDoNothing();
     }
 

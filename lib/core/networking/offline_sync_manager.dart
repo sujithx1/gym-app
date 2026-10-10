@@ -178,6 +178,7 @@ class OfflineSyncManager {
 
           case 'create_exercise':
             final result = await api.directCreateExercise(
+              id: mutation.payload['id'],
               name: mutation.payload['name'],
               muscleGroup: mutation.payload['muscleGroup'],
               equipment: mutation.payload['equipment'],

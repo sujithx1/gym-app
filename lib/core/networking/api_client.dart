@@ -170,6 +170,7 @@ class ApiClient {
   }
 
   Future<Map<String, dynamic>?> directCreateExercise({
+    String? id,
     required String name,
     required String muscleGroup,
     required String equipment,
@@ -179,6 +180,7 @@ class ApiClient {
       Uri.parse('$baseUrl/exercises'),
       headers: _headers,
       body: jsonEncode({
+        if (id != null) 'id': id,
         'name': name,
         'muscleGroup': muscleGroup,
         'equipment': equipment,
@@ -357,7 +359,9 @@ class ApiClient {
       }
 
       // Offline queueing
+      final localExerciseId = 'ex_offline_${DateTime.now().millisecondsSinceEpoch}';
       await syncManager.queueMutation('create_exercise', {
+        'id': localExerciseId,
         'name': name,
         'muscleGroup': muscleGroup,
         'equipment': equipment,
@@ -365,7 +369,7 @@ class ApiClient {
       });
 
       final localExercise = {
-        'id': 'ex_offline_${DateTime.now().millisecondsSinceEpoch}',
+        'id': localExerciseId,
         'name': name,
         'muscleGroup': muscleGroup,
         'equipment': equipment,
