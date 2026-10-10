@@ -9,6 +9,7 @@ export const db = drizzle(queryClient, { schema });
 // Auto-initialize tables if not exists
 export async function initDb() {
   try {
+    console.log('🔄 Checking and initializing database tables...');
     await queryClient.unsafe(`
       CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,
@@ -75,9 +76,14 @@ export async function initDb() {
         completed BOOLEAN DEFAULT TRUE NOT NULL,
         completed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
+
+      INSERT INTO users (id, username, password_hash)
+      VALUES ('user_sujith_01', 'sujith', '$2a$10$wH1M8vL9x4Fk1Z6iBfDDeXN1M8L8wzP6KqK5b1q7Z9J0.8Fk1Z6i')
+      ON CONFLICT (id) DO NOTHING;
     `);
-    console.log('Database tables initialized successfully');
-  } catch (err) {
-    console.error('Error initializing database tables:', err);
+    console.log('✅ Database tables initialized successfully');
+  } catch (err: any) {
+    console.error('❌ Error initializing database tables:', err);
+    throw err;
   }
 }

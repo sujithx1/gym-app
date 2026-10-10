@@ -144,7 +144,8 @@ workoutRoutes.get('/today', async (c) => {
       },
     });
   } catch (err: any) {
-    return c.json({ error: err.message || 'Error loading today workout' }, 500);
+    console.error('❌ [Workouts] Error in GET /api/workouts/today:', err);
+    return c.json({ error: err.message || 'Error loading today workout', details: String(err) }, 500);
   }
 });
 
@@ -186,7 +187,8 @@ workoutRoutes.get('/plans', async (c) => {
       })),
     });
   } catch (err: any) {
-    return c.json({ error: err.message }, 500);
+    console.error('❌ [Workouts] Error in GET /api/workouts/plans:', err);
+    return c.json({ error: err.message, details: String(err) }, 500);
   }
 });
 

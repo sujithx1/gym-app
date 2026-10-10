@@ -40,7 +40,8 @@ authRoutes.post('/login', async (c) => {
       },
     });
   } catch (err: any) {
-    return c.json({ error: err.message || 'Server error' }, 500);
+    console.error('❌ [Auth] Error in POST /api/auth/login:', err);
+    return c.json({ error: err.message || 'Server error', details: String(err) }, 500);
   }
 });
 

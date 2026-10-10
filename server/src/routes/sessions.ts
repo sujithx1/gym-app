@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { eq, and, desc, asc, ne, count } from 'drizzle-orm';
 import { db } from '../db';
-import { workoutSessions, sets } from '../db/schema';
+import { workoutSessions, sets, users } from '../db/schema';
 import { authMiddleware, Env } from '../middleware/auth';
 
 const sessionRoutes = new Hono<Env>();
@@ -12,6 +12,17 @@ sessionRoutes.post('/start', async (c) => {
   try {
     const userId = c.get('userId');
     const { workoutDayId, name } = await c.req.json();
+
+    console.log(`[Sessions] Starting session for user=${userId}, workoutDayId=${workoutDayId}, name=${name}`);
+
+    // Ensure user exists in users table so foreign key constraint is satisfied
+    if (userId) {
+      await (db.insert(users) as any).values({
+        id: userId,
+        username: c.get('username') || userId,
+        passwordHash: 'placeholder',
+      }).onConflictDoNothing();
+    }
 
     const sessionId = `sess_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
@@ -24,13 +35,16 @@ sessionRoutes.post('/start', async (c) => {
       status: 'in_progress',
     });
 
+    console.log(`✅ [Sessions] Session started successfully: ${sessionId}`);
+
     return c.json({
       sessionId,
       status: 'in_progress',
       startedAt: new Date(),
     });
   } catch (err: any) {
-    return c.json({ error: err.message || 'Failed to start session' }, 500);
+    console.error('❌ [Sessions] Error in POST /api/sessions/start:', err);
+    return c.json({ error: err.message || 'Failed to start session', details: String(err) }, 500);
   }
 });
 
@@ -69,18 +83,47 @@ sessionRoutes.get('/:id', async (c) => {
       })),
     });
   } catch (err: any) {
-    return c.json({ error: err.message }, 500);
+    console.error(`❌ [Sessions] Error in GET /api/sessions/${c.req.param('id')}:`, err);
+    return c.json({ error: err.message, details: String(err) }, 500);
   }
 });
 
 // PUT /api/sessions/:id/set -> Log/update a set using Drizzle upsert
 sessionRoutes.put('/:id/set', async (c) => {
   try {
+    const userId = c.get('userId');
     const sessionId = c.req.param('id');
     const { exerciseId, setNumber, weight, reps, completed } = await c.req.json();
 
     if (!exerciseId || setNumber === undefined || weight === undefined || reps === undefined) {
       return c.json({ error: 'Missing set information' }, 400);
+    }
+
+    // Ensure user exists
+    if (userId) {
+      await (db.insert(users) as any).values({
+        id: userId,
+        username: c.get('username') || userId,
+        passwordHash: 'placeholder',
+      }).onConflictDoNothing();
+    }
+
+    // Ensure session exists (supports offline sessions syncing back to server)
+    const existingSession = await db
+      .select({ id: workoutSessions.id })
+      .from(workoutSessions)
+      .where(eq(workoutSessions.id, sessionId))
+      .limit(1);
+
+    if (existingSession.length === 0) {
+      console.log(`[Sessions] Session ${sessionId} not found during set log. Creating session entry...`);
+      await (db.insert(workoutSessions) as any).values({
+        id: sessionId,
+        userId: userId || 'user_sujith_01',
+        name: "Synced Workout",
+        startedAt: new Date(),
+        status: 'in_progress',
+      }).onConflictDoNothing();
     }
 
     const setId = `set_${sessionId}_${exerciseId}_${setNumber}`;
@@ -106,6 +149,8 @@ sessionRoutes.put('/:id/set', async (c) => {
         },
       });
 
+    console.log(`✅ [Sessions] Logged set ${setNumber} for exercise ${exerciseId} in session ${sessionId}`);
+
     return c.json({
       setId,
       exerciseId,
@@ -115,7 +160,8 @@ sessionRoutes.put('/:id/set', async (c) => {
       completed: completed ?? true,
     });
   } catch (err: any) {
-    return c.json({ error: err.message }, 500);
+    console.error(`❌ [Sessions] Error in PUT /api/sessions/${c.req.param('id')}/set:`, err);
+    return c.json({ error: err.message, details: String(err) }, 500);
   }
 });
 
@@ -126,17 +172,50 @@ sessionRoutes.post('/:id/complete', async (c) => {
     const sessionId = c.req.param('id');
     const { notes } = await c.req.json().catch(() => ({ notes: '' }));
 
+    console.log(`[Sessions] Completing session ${sessionId} for user=${userId}`);
+
+    // Ensure user exists
+    if (userId) {
+      await (db.insert(users) as any).values({
+        id: userId,
+        username: c.get('username') || userId,
+        passwordHash: 'placeholder',
+      }).onConflictDoNothing();
+    }
+
     const sessionsList = await db
       .select()
       .from(workoutSessions)
       .where(and(eq(workoutSessions.id, sessionId), eq(workoutSessions.userId, userId)))
       .limit(1);
 
-    if (sessionsList.length === 0) {
-      return c.json({ error: 'Session not found' }, 404);
-    }
+    let session = sessionsList[0];
 
-    const session = sessionsList[0];
+    // If session not found, auto-create it (supports offline sessions created locally)
+    if (!session) {
+      console.log(`[Sessions] Session ${sessionId} not in database during complete. Auto-creating session...`);
+      const now = new Date();
+      await (db.insert(workoutSessions) as any).values({
+        id: sessionId,
+        userId,
+        name: 'Completed Workout',
+        startedAt: new Date(now.getTime() - 3600000),
+        status: 'in_progress',
+      }).onConflictDoNothing();
+
+      const refetched = await db
+        .select()
+        .from(workoutSessions)
+        .where(eq(workoutSessions.id, sessionId))
+        .limit(1);
+
+      if (refetched.length > 0) {
+        session = refetched[0];
+      } else {
+        console.warn(`[Sessions] Session ${sessionId} not found`);
+        return c.json({ error: 'Session not found' }, 404);
+      }
+    }
 
     // 1. Fetch completed sets for this session
     const completedSets = await db
@@ -181,6 +260,8 @@ sessionRoutes.post('/:id/complete', async (c) => {
     const previousVolume = previousSessions.length > 0 ? Number(previousSessions[0].totalVolumeKg) : 0;
     const volumeDeltaKg = totalVolumeKg - previousVolume;
 
+    console.log(`✅ [Sessions] Session ${sessionId} completed successfully. Total Volume: ${totalVolumeKg}kg`);
+
     return c.json({
       success: true,
       summary: {
@@ -198,7 +279,8 @@ sessionRoutes.post('/:id/complete', async (c) => {
       },
     });
   } catch (err: any) {
-    return c.json({ error: err.message || 'Error completing session' }, 500);
+    console.error(`❌ [Sessions] Error in POST /api/sessions/${c.req.param('id')}/complete:`, err);
+    return c.json({ error: err.message || 'Error completing session', details: String(err) }, 500);
   }
 });
 
@@ -245,7 +327,8 @@ sessionRoutes.get('/history/all', async (c) => {
       })),
     });
   } catch (err: any) {
-    return c.json({ error: err.message }, 500);
+    console.error('❌ [Sessions] Error in GET /api/sessions/history/all:', err);
+    return c.json({ error: err.message, details: String(err) }, 500);
   }
 });
 

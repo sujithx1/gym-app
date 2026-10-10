@@ -115,7 +115,8 @@ progressRoutes.get('/overview', async (c) => {
       })),
     });
   } catch (err: any) {
-    return c.json({ error: err.message }, 500);
+    console.error('❌ [Progress] Error in GET /api/progress/overview:', err);
+    return c.json({ error: err.message, details: String(err) }, 500);
   }
 });
 
@@ -152,7 +153,8 @@ progressRoutes.get('/strength/:exerciseId', async (c) => {
       })),
     });
   } catch (err: any) {
-    return c.json({ error: err.message }, 500);
+    console.error(`❌ [Progress] Error in GET /api/progress/strength/${c.req.param('exerciseId')}:`, err);
+    return c.json({ error: err.message, details: String(err) }, 500);
   }
 });
 

@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { eq, or, and, max, desc, asc } from 'drizzle-orm';
 import { db } from '../db';
-import { exercises, sets, workoutSessions } from '../db/schema';
+import { exercises, sets, workoutSessions, users } from '../db/schema';
 import { authMiddleware, Env } from '../middleware/auth';
 
 const exerciseRoutes = new Hono<Env>();
@@ -12,7 +12,6 @@ exerciseRoutes.get('/', async (c) => {
   try {
     const userId = c.get('userId');
     const muscleGroup = c.req.query('muscleGroup');
-
 
     const userCondition = or(
       eq(exercises.isCustom, false),
@@ -31,7 +30,8 @@ exerciseRoutes.get('/', async (c) => {
 
     return c.json({ exercises: exercisesList });
   } catch (err: any) {
-    return c.json({ error: err.message }, 500);
+    console.error('❌ [Exercises] Error in GET /api/exercises:', err);
+    return c.json({ error: err.message, details: String(err) }, 500);
   }
 });
 
@@ -41,9 +41,18 @@ exerciseRoutes.post('/', async (c) => {
     const userId = c.get('userId');
     const { name, muscleGroup, equipment, instructions } = await c.req.json();
 
-    console.log(name, muscleGroup, equipment, instructions);
+    console.log(`[Exercises] Creating custom exercise: "${name}" (${muscleGroup}) for user=${userId}`);
     if (!name || !muscleGroup) {
       return c.json({ error: 'Name and Muscle Group are required' }, 400);
+    }
+
+    // Ensure user exists in users table so foreign key constraint is satisfied
+    if (userId) {
+      await (db.insert(users) as any).values({
+        id: userId,
+        username: c.get('username') || userId,
+        passwordHash: 'placeholder',
+      }).onConflictDoNothing();
     }
 
     const id = `ex_custom_${Date.now()}`;
@@ -58,6 +67,8 @@ exerciseRoutes.post('/', async (c) => {
       userId,
     });
 
+    console.log(`✅ [Exercises] Custom exercise created successfully: ${id} (${name})`);
+
     return c.json({
       id,
       name,
@@ -67,7 +78,8 @@ exerciseRoutes.post('/', async (c) => {
       isCustom: true,
     });
   } catch (err: any) {
-    return c.json({ error: err.message }, 500);
+    console.error('❌ [Exercises] Error creating custom exercise in POST /api/exercises:', err);
+    return c.json({ error: err.message || 'Failed to create exercise', details: String(err) }, 500);
   }
 });
 
@@ -144,7 +156,8 @@ exerciseRoutes.get('/:id/stats', async (c) => {
       })),
     });
   } catch (err: any) {
-    return c.json({ error: err.message }, 500);
+    console.error(`❌ [Exercises] Error in GET /api/exercises/${c.req.param('id')}/stats:`, err);
+    return c.json({ error: err.message, details: String(err) }, 500);
   }
 });
 
