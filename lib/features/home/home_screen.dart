@@ -7,6 +7,7 @@ import '../../core/widgets/treadmill_loading.dart';
 import '../../core/widgets/ios_welcome_header.dart';
 import '../workout/today_workout_screen.dart';
 import '../workout/create_workout_screen.dart';
+import '../workout/workout_history_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   final Function(int)? onNavigateTab;
@@ -320,7 +321,11 @@ class HomeScreen extends ConsumerWidget {
                   loading: () => const SizedBox.shrink(),
                   error: (_, stack) => const SizedBox.shrink(),
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 18),
+
+                // Workout Days & Weights History Banner
+                _buildWorkoutHistoryBanner(context),
+                const SizedBox(height: 24),
 
                 // Personal Records Header
                 Row(
@@ -512,6 +517,88 @@ class HomeScreen extends ConsumerWidget {
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildWorkoutHistoryBanner(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const WorkoutHistoryScreen()),
+        );
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: GymTheme.mint,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: GymTheme.mint.withValues(alpha: 0.35),
+              blurRadius: 14,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: const Icon(
+                Icons.calendar_month_rounded,
+                color: GymTheme.textPrimary,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text(
+                    'WORKOUT DAYS & WEIGHTS',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.0,
+                      color: GymTheme.textPrimary,
+                    ),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    'View Logs & Weights Lifted',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                      color: GymTheme.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              width: 32,
+              height: 32,
+              decoration: const BoxDecoration(
+                color: GymTheme.textPrimary,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.arrow_forward_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

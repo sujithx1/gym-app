@@ -180,7 +180,7 @@ class ApiClient {
       Uri.parse('$baseUrl/exercises'),
       headers: _headers,
       body: jsonEncode({
-        if (id != null) 'id': id,
+        'id': ?id,
         'name': name,
         'muscleGroup': muscleGroup,
         'equipment': equipment,
@@ -382,6 +382,51 @@ class ApiClient {
       await syncManager.addLocalCachedExercise(localExercise);
 
       return localExercise;
+    });
+  }
+
+  // --- Workout History & Days APIs ---
+  Future<List<dynamic>> getWorkoutHistory({int limit = 30}) async {
+    return _trackRequest(showGlobalLoading: false, () async {
+      try {
+        final res = await http
+            .get(Uri.parse('$baseUrl/workouts/history?limit=$limit'), headers: _headers)
+            .timeout(const Duration(seconds: 4));
+
+        if (res.statusCode == 200) {
+          final data = jsonDecode(res.body);
+          final sessions = data['sessions'] as List<dynamic>? ?? [];
+          await syncManager.cacheWorkoutHistory(sessions);
+          return sessions;
+        }
+      } catch (_) {
+        // Fallback to cache if offline
+      }
+
+      final cached = await syncManager.getCachedWorkoutHistory();
+      return cached ?? [];
+    });
+  }
+
+  Future<List<dynamic>> getWorkoutDays() async {
+    return _trackRequest(showGlobalLoading: false, () async {
+      try {
+        final res = await http
+            .get(Uri.parse('$baseUrl/workouts/days'), headers: _headers)
+            .timeout(const Duration(seconds: 4));
+
+        if (res.statusCode == 200) {
+          final data = jsonDecode(res.body);
+          final days = data['days'] as List<dynamic>? ?? [];
+          await syncManager.cacheWorkoutDays(days);
+          return days;
+        }
+      } catch (_) {
+        // Fallback
+      }
+
+      final cached = await syncManager.getCachedWorkoutDays();
+      return cached ?? [];
     });
   }
 }

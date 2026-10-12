@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/gym_theme.dart';
 import '../../core/providers/app_providers.dart';
 import '../../core/widgets/treadmill_loading.dart';
+import '../workout/workout_history_screen.dart';
 
 class ProgressScreen extends ConsumerStatefulWidget {
   const ProgressScreen({super.key});
@@ -19,6 +20,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
   @override
   Widget build(BuildContext context) {
     final progressAsync = ref.watch(progressOverviewProvider);
+    final historyAsync = ref.watch(workoutHistoryProvider);
 
     return Scaffold(
       backgroundColor: GymTheme.getBackgroundColor(context),
@@ -26,6 +28,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
         child: TreadmillRefreshIndicator(
           onRefresh: () async {
             ref.invalidate(progressOverviewProvider);
+            ref.invalidate(workoutHistoryProvider);
           },
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -368,18 +371,73 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                 const SizedBox(height: 28),
 
                 // Workout History Timeline
-                const Text(
-                  'WORKOUT HISTORY',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: GymTheme.textMuted),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'WORKOUT HISTORY',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: GymTheme.textMuted),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const WorkoutHistoryScreen()),
+                        );
+                      },
+                      child: Text(
+                        'VIEW ALL →',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.8,
+                          color: GymTheme.getPrimaryColor(context),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 12),
 
-                Column(
-                  children: [
-                    _buildHistoryItem('TODAY', 'Chest + Triceps', '18 sets · 4,820 kg', GymTheme.mint),
-                    _buildHistoryItem('SEP 8', 'Back + Biceps', '16 sets · 4,200 kg', GymTheme.periwinkle),
-                    _buildHistoryItem('SEP 6', 'Legs', '20 sets · 5,100 kg', GymTheme.peach),
-                  ],
+                historyAsync.when(
+                  data: (sessions) {
+                    if (sessions.isEmpty) {
+                      return Column(
+                        children: [
+                          _buildHistoryItem('TODAY', 'Chest + Triceps', '18 sets · 4,820 kg', GymTheme.mint),
+                          _buildHistoryItem('SEP 8', 'Back + Biceps', '16 sets · 4,200 kg', GymTheme.periwinkle),
+                          _buildHistoryItem('SEP 6', 'Legs', '20 sets · 5,100 kg', GymTheme.peach),
+                        ],
+                      );
+                    }
+
+                    final colors = [GymTheme.mint, GymTheme.periwinkle, GymTheme.peach, GymTheme.yellow];
+                    final displayList = sessions.take(4).toList();
+
+                    return Column(
+                      children: displayList.asMap().entries.map((entry) {
+                        final idx = entry.key;
+                        final sess = entry.value as Map<String, dynamic>;
+                        final dateStr = (sess['formattedDate'] ?? 'LOGGED').toString().toUpperCase();
+                        final name = sess['name'] ?? 'Workout Session';
+                        final volume = (sess['totalVolumeKg'] as num?)?.toDouble() ?? 0.0;
+                        final totalSets = sess['totalSets'] ?? 0;
+                        final subtitle = '$totalSets sets · ${volume.toInt()} kg volume';
+
+                        return _buildHistoryItem(dateStr, name, subtitle, colors[idx % colors.length]);
+                      }).toList(),
+                    );
+                  },
+                  loading: () => const Center(child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(),
+                  )),
+                  error: (error, stack) => Column(
+                    children: [
+                      _buildHistoryItem('TODAY', 'Chest + Triceps', '18 sets · 4,820 kg', GymTheme.mint),
+                      _buildHistoryItem('SEP 8', 'Back + Biceps', '16 sets · 4,200 kg', GymTheme.periwinkle),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -443,43 +501,57 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
   }
 
   Widget _buildHistoryItem(String date, String title, String subtitle, Color color) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: GymTheme.getSurfaceColor(context),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: GymTheme.getBorderColor(context)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              date,
-              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: GymTheme.textPrimary),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: GymTheme.getTextPrimaryColor(context)),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const WorkoutHistoryScreen()),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: GymTheme.getSurfaceColor(context),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: GymTheme.getBorderColor(context)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(12),
               ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: GymTheme.getTextSecondaryColor(context)),
+              child: Text(
+                date,
+                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: GymTheme.textPrimary),
               ),
-            ],
-          ),
-        ],
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: GymTheme.getTextPrimaryColor(context)),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: GymTheme.getTextSecondaryColor(context)),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: GymTheme.getTextSecondaryColor(context).withValues(alpha: 0.6),
+            ),
+          ],
+        ),
       ),
     );
   }

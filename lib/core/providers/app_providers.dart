@@ -167,6 +167,8 @@ class SyncNotifier extends StateNotifier<SyncState> {
     _ref.invalidate(todayWorkoutProvider);
     _ref.invalidate(progressOverviewProvider);
     _ref.invalidate(exercisesProvider);
+    _ref.invalidate(workoutHistoryProvider);
+    _ref.invalidate(workoutDaysProvider);
 
     return result;
   }
@@ -197,6 +199,18 @@ final exercisesProvider = FutureProvider.autoDispose<List<dynamic>>((ref) async 
   return await api.getExercises(filter);
 });
 
+// Workout History Provider (List of completed workout days with sets and weights lifted)
+final workoutHistoryProvider = FutureProvider.autoDispose<List<dynamic>>((ref) async {
+  final api = ref.watch(apiClientProvider);
+  return await api.getWorkoutHistory();
+});
+
+// Workout Days Provider (List of weekly routine days with target and last lifted weights)
+final workoutDaysProvider = FutureProvider.autoDispose<List<dynamic>>((ref) async {
+  final api = ref.watch(apiClientProvider);
+  return await api.getWorkoutDays();
+});
+
 // Server URL Provider
 class ServerUrlNotifier extends StateNotifier<String> {
   final ApiClient _apiClient;
@@ -211,6 +225,8 @@ class ServerUrlNotifier extends StateNotifier<String> {
     _ref.invalidate(todayWorkoutProvider);
     _ref.invalidate(progressOverviewProvider);
     _ref.invalidate(exercisesProvider);
+    _ref.invalidate(workoutHistoryProvider);
+    _ref.invalidate(workoutDaysProvider);
   }
 
   Future<bool> testConnection([String? testUrl]) async {

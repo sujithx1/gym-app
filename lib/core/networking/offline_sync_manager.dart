@@ -35,6 +35,8 @@ class OfflineSyncManager {
   static const String _todayWorkoutCacheKey = 'offline_cache_today_workout';
   static const String _progressCacheKey = 'offline_cache_progress_overview';
   static const String _exercisesCacheKey = 'offline_cache_exercises';
+  static const String _workoutHistoryCacheKey = 'offline_cache_workout_history';
+  static const String _workoutDaysCacheKey = 'offline_cache_workout_days';
 
   // --- Pending Queue Operations ---
 
@@ -133,6 +135,38 @@ class OfflineSyncManager {
         e['name'].toString().toLowerCase() == exercise['name'].toString().toLowerCase());
     list.insert(0, exercise);
     await cacheExercises(list);
+  }
+
+  Future<void> cacheWorkoutHistory(List<dynamic> history) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_workoutHistoryCacheKey, jsonEncode(history));
+  }
+
+  Future<List<dynamic>?> getCachedWorkoutHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonStr = prefs.getString(_workoutHistoryCacheKey);
+    if (jsonStr == null) return null;
+    try {
+      return jsonDecode(jsonStr);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> cacheWorkoutDays(List<dynamic> days) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_workoutDaysCacheKey, jsonEncode(days));
+  }
+
+  Future<List<dynamic>?> getCachedWorkoutDays() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonStr = prefs.getString(_workoutDaysCacheKey);
+    if (jsonStr == null) return null;
+    try {
+      return jsonDecode(jsonStr);
+    } catch (_) {
+      return null;
+    }
   }
 
   // --- Sync DB logic ---
